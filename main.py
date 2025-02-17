@@ -22,7 +22,7 @@ def task_add(tasks, total_hours):
 
             # Validate name: Must contain only letters and spaces
             if not name.replace(" ", "").isalpha():
-                raise ValueError("Invalid name, please enter a word.")
+                raise ValueError("Λάθος όνομα του Task, παρακαλώ γράψτε μια λέξη.")
             
             hours = float(input("Δώσε την εβδομαδιαία διάρκεια σε ώρες: "))
 
@@ -35,12 +35,15 @@ def task_add(tasks, total_hours):
             importance = int(input("Δώσε τον βαθμό σημαντικότητας του στόχου: "))
 
             if not (1 <= importance <= 10):
-                raise ValueError("Importance must be a number between 1 - 10")
+                raise ValueError("Ο αριθμός πρέπει να είναι απο 1 - 10")
 
         except ValueError:
-            print("Invalid input. Please enter numbers for hours and importance.")
+            print("Λάθος εισαγωγή, παρακαλώ βάλτε αριθμούς για τις ώρες και την συμαντικότητα.")
             continue
 
+        free_time = float(input("Δώσε τον ελεύθερο χρόνο που έχεις συνολικά για την εβδομάδα: "))
+        if not 1 <= free_time <= 168:
+            raise ValueError("Δεν μπορείς να ξεπεράσεις τις 168 ώρες της εβδομάδας!")
             
         tasks.append({"name": name, "hours": hours, "importance": importance})
         total_hours += hours
@@ -60,35 +63,34 @@ def task_edit():
         print(f"{i + 1}. {task['name']}")
 
     try:
-        task_index = int(input("Δώσε τον αριθμό του Task που θέλεις να κάνεις τροποποίηση: "))
-        if task_index >= len(tasks) or task < 0:
+        task_index = int(input("Δώσε τον αριθμό του Task που θέλεις να κάνεις τροποποίηση: ")) - 1
+        if task_index < 0 or task_index >= len(tasks):
             print("Άκυρη επιλογή, παρακαλώ δώστε τον αριθμό του Task.")
             return
-    except ValueError("Παρακαλώ εισάγετε έναν έγκυρο αριθμό."):
+    except ValueError:
+        print("Παρακαλώ εισάγετε έναν έγκυρο αριθμό.")
         return
 
     current_task = tasks[task_index]
 
-    user_input = int(input())
-    if(user_input == 1):
-        new_name = input("Δώστε το νέο όνομα του Task: ")
-        if(new_name.replace(" ", "").isalpha()):
-            current_task['name'] = new_name
-        else:
-            print("Μη αποδεκτό όνομα.")
-    
+    new_name = input("Δώστε το νέο όνομα του Task: ")
+    if(new_name.replace(" ", "").isalpha()):
+        current_task['name'] = new_name
+    else:
+        print("Μη αποδεκτό όνομα.")
+
     new_hours = float(input("Παρακαλώ, δώστε τις εβδομαδιαίες ώρες: "))
     if 0 <= new_hours <= 168:
         current_task['hours'] = new_hours
     else:
         print("Άκυρη εισαγωγή ώρας, παρακαλώ προσπαθήστε ξανά.")
-    
+
     new_importance = int(input("Δώσε τον βαθμό σημαντικότητας του Task: "))
     if 1 <= new_importance <= 10:
         current_task['importance'] = new_importance
     else:
         print("Άκυρη τιμή σημαντικότητας του Task. Παρακαλώ προσπαθήστε ξανά.")
-    
+        
 
 while True:
     display_menu()
