@@ -136,12 +136,15 @@ def sort_by_importance():
         print(f"{i + 1}. {task['name']} (Importance: {task['importance']}, Hours: {task['hours']})")
 
 def show_all():
+    # Ελέγχουμε αν δεν υπάρχουν tasks στον κατάλογο
     if not tasks:
-        print("\nΔεν υπάρχουν στόχοι.\n")
-        return
-    
-    print("\n--- Όλοι οι στόχοι ---")
+        print("Δεν υπάρχουν στόχοι.")  # Εκτυπώνουμε μήνυμα αν δεν υπάρχουν tasks
+        return  # Επιστρέφουμε για να σταματήσει η συνάρτηση εδώ αν είναι κενό το tasks[]
+
+    print("\n--- Όλοι οι στόχοι ---")  # Εμφανίζουμε τίτλο για να ξέρει ο χρήστης ότι ακολουθεί η λίστα των tasks
+    # Διατρέχουμε όλα τα tasks με την μέθοδο enumerate για να έχουμε και τον αριθμό του task (i) και τα δεδομένα του task (task)
     for i, task in enumerate(tasks):
+        # Εκτυπώνουμε τα δεδομένα του κάθε task με τις πληροφορίες του (όνομα, ώρες και σημαντικότητα)
         print(f"{i + 1}. Όνομα: {task['name']}, Διάρκεια: {task['hours']} ώρες, Σημαντικότητα: {task['importance']}")
 
 
