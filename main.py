@@ -72,6 +72,8 @@ def task_add(tasks, total_hours):
     return total_hours
 
 def task_edit():
+    global total_hours  # Για να αλλάξουμε τη συνολική διάρκεια των tasks
+
     if not tasks:
         print("Δεν υπάρχουν στόχοι για τροποποίηση.")
         return
@@ -91,6 +93,9 @@ def task_edit():
 
     current_task = tasks[task_index]
 
+    # Αφαιρούμε τις παλιές ώρες από το total_hours
+    total_hours -= current_task['hours']
+
     # Ζητάμε από τον χρήστη να τροποποιήσει το όνομα, τις ώρες και τη σημαντικότητα
     new_name = input("Δώστε το νέο όνομα του Task: ")
     if(new_name.replace(" ", "").isalpha()):
@@ -98,19 +103,33 @@ def task_edit():
     else:
         print("Μη αποδεκτό όνομα.")
 
-    new_hours = float(input("Παρακαλώ, δώστε τις εβδομαδιαίες ώρες: "))
-    if 0 <= new_hours <= 168:  # Έλεγχος αν οι νέες ώρες είναι εντός του εύρους [0, 168]
-        current_task['hours'] = new_hours
-    else:
+    try:
+        new_hours = float(input("Παρακαλώ, δώστε τις εβδομαδιαίες ώρες: "))
+        if 0 <= new_hours <= 168:
+            current_task['hours'] = new_hours
+        else:
+            raise ValueError("Άκυρη εισαγωγή ώρας.")
+    except ValueError:
         print("Άκυρη εισαγωγή ώρας, παρακαλώ προσπαθήστε ξανά.")
+        return
 
-    new_importance = int(input("Δώσε τον βαθμό σημαντικότητας του Task: "))
-    if 1 <= new_importance <= 10:  # Έλεγχος αν η νέα σημαντικότητα είναι εντός του εύρους [1, 10]
-        current_task['importance'] = new_importance
-    else:
-        print("Άκυρη τιμή σημαντικότητας του Task. Παρακαλώ προσπαθήστε ξανά.")
+    try:
+        new_importance = int(input("Δώσε τον βαθμό σημαντικότητας του Task: "))
+        if 1 <= new_importance <= 10:
+            current_task['importance'] = new_importance
+        else:
+            raise ValueError("Άκυρη τιμή σημαντικότητας.")
+    except ValueError:
+        print("Άκυρη τιμή σημαντικότητας, παρακαλώ προσπαθήστε ξανά.")
+        return
+
+    # Προσθέτουμε τις νέες ώρες στο total_hours
+    total_hours += current_task['hours']
+    print("Η τροποποίηση ολοκληρώθηκε επιτυχώς.")
 
 def task_del():
+    global total_hours  # Χρειάζεται για να ενημερώσουμε τις συνολικές ώρες
+
     if not tasks:
         print("Δεν υπάρχουν στόχοι για διαγραφή.")
         return
@@ -128,7 +147,13 @@ def task_del():
         print("Παρακαλώ εισάγετε έναν έγκυρο αριθμό.")
         return
 
-    tasks.pop(task_index)  # Διαγραφή του επιλεγμένου στόχου
+    # Αφαιρούμε τις ώρες του task από το total_hours
+    total_hours -= tasks[task_index]['hours']
+
+    # Διαγραφή του task
+    del tasks[task_index]
+
+    print("Το Task διαγράφηκε επιτυχώς.")
 
 def sort_by_importance():
     print("\nΈγινε η ταξινόμιση με βάση του πόσο σημαντικό είναι το κάθε Task.\n")
@@ -148,13 +173,21 @@ def show_all():
         # Εκτυπώνουμε τα δεδομένα του κάθε task με τις πληροφορίες του (όνομα, ώρες και σημαντικότητα)
         print(f"{i + 1}. Όνομα: {task['name']}, Διάρκεια: {task['hours']} ώρες, Σημαντικότητα: {task['importance']}")
 
-def avarage_time():
+def average_time():
     if not tasks:
         print("\nΔεν έχουν υποβληθεί Tasks.\n")
-    else:    
-        global total_hours
-        avarage = total_hours / len(tasks)
-        print(f"Ο μέσος όρος των Tasks της εβδομάδας είναι:", avarage, "ώρες")
+        return
+    else:
+        # Αρχικοποίηση του συνόλου των ωρών
+        total_hours = 0  
+        for task in tasks:
+            # Πρόσθεση των ωρών κάθε task
+            total_hours += task['hours']  
+        
+        # Υπολογισμός μέσου όρου
+        average = total_hours / len(tasks)  
+        print(f"Ο μέσος όρος των Tasks της εβδομάδας είναι: {average:.2f} ώρες")
+
 
 # Κύριος βρόχος του προγράμματος που εκτελεί το μενού και τις επιλογές του χρήστη
 while True:
@@ -171,6 +204,6 @@ while True:
     elif user_input == 5:
         show_all()  # Καλούμε τη συνάρτηση για εμφάνιση όλων των στόχων
     elif user_input == 6:
-        avarage_time()
+        average_time()
     elif user_input == 7:
         break  # Τερματίζουμε το πρόγραμμα όταν επιλεγεί η έξοδος
