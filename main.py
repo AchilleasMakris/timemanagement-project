@@ -1,3 +1,4 @@
+# Use pip install matplotlib to install the library
 import matplotlib.pyplot as plt
 
 tasks = []  # Λίστα που αποθηκεύει όλους τους στόχους
