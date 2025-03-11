@@ -1,3 +1,5 @@
+import matplotlib.pyplot as plt
+
 tasks = []  # Λίστα που αποθηκεύει όλους τους στόχους
 total_hours = 0.0  # Μεταβλητή που αποθηκεύει τον συνολικό αριθμό ωρών που έχουν ανατεθεί στους στόχους
 free_time_flag = False  # Σημαία που δείχνει αν ο ελεύθερος χρόνος έχει οριστεί
@@ -12,7 +14,9 @@ def display_menu():
     print("4. Ταξινόμιση κατά σημαντικότητα")
     print("5. Εκτύπωση όλων των στόχων")
     print("6. Μέσος όρος χρόνου των Task")
-    print("7. Έξοδος")
+    print("7. Γράφημα Πίτας")
+    print("8. Γράφημα Στηλών")
+    print("9. Έξοδος")
 
 def task_add(tasks, total_hours):
     global free_time, free_time_flag  # Δηλώνουμε τις μεταβλητές ως global για να τις τροποποιούμε
@@ -33,6 +37,10 @@ def task_add(tasks, total_hours):
     while True:
         try:
             name = input("Δώσε το όνομα του στόχου: ").strip()
+
+            # Έλεγχος αν το όνομα του στόχου υπάρχει ήδη
+            if any(task['name'] == name for task in tasks):
+                raise ValueError("Το όνομα του στόχου υπάρχει ήδη. Παρακαλώ επιλέξτε διαφορετικό όνομα.")
 
             # Έλεγχος αν το όνομα είναι αποδεκτό (μία λέξη χωρίς κενά)
             if not name.replace(" ", "").isalpha():
@@ -56,9 +64,10 @@ def task_add(tasks, total_hours):
             # Έλεγχος αν ο βαθμός σημαντικότητας είναι εντός του εύρους [1, 10]
             if not (1 <= importance <= 10):
                 raise ValueError("Ο αριθμός πρέπει να είναι απο 1 - 10")
-
-        except ValueError:
-            print("Λάθος εισαγωγή, παρακαλώ βάλτε αριθμούς για τις ώρες και την σημαντικότητα.")
+            
+        # Χρήση του e για να μην μπερδευτεί με τα άλλα σφάλματα
+        except ValueError as e:
+            print(e)  # Εκτύπωση του μηνύματος σφάλματος που προκλήθηκε
             continue
 
         # Προσθήκη του στόχου στη λίστα
@@ -173,6 +182,8 @@ def show_all():
         # Εκτυπώνουμε τα δεδομένα του κάθε task με τις πληροφορίες του (όνομα, ώρες και σημαντικότητα)
         print(f"{i + 1}. Όνομα: {task['name']}, Διάρκεια: {task['hours']} ώρες, Σημαντικότητα: {task['importance']}")
 
+        #TODO PRINT TOTAL FREE TIME
+
 def average_time():
     if not tasks:
         print("\nΔεν έχουν υποβληθεί Tasks.\n")
@@ -188,11 +199,66 @@ def average_time():
         average = total_hours / len(tasks)  
         print(f"Ο μέσος όρος των Tasks της εβδομάδας είναι: {average:.2f} ώρες")
 
+def plot_pie_chart(tasks, free_time, total_hours):
+    if not tasks:
+        print("Δεν υπάρχουν στόχοι για να δημιουργηθεί το γράφημα.")
+        return
+    
+    # Δημιουργούμε λίστες με τα ονόματα των στόχων και τις ώρες που αφιερώνονται σε αυτούς
+    labels = [task['name'] for task in tasks]
+    sizes = [task['hours'] for task in tasks]
+
+    plt.figure(figsize=(8, 8))
+    
+    # Τροποποίηση του autopct για να εμφανίζει το ποσοστό και τις ώρες
+    def make_autopct(values):
+        def my_autopct(pct):
+            total = sum(values)
+            val = int(round(pct*total/100.0))
+            return f'{pct:.1f}%\n({val} ώρες)'
+        return my_autopct
+    
+    # Δημιουργία γραφήματος πίτας με τις ώρες και τα ονόματα των στόχων
+    plt.pie(sizes, labels=labels, autopct=make_autopct(sizes), startangle=140)
+    plt.axis('equal')  # Ισότητα αξόνων για να είναι κυκλικό το γράφημα
+    plt.title('Κατανομή Χρόνου στους Στόχους')
+
+    # Προσθήκη κειμένου για το συνολικό χρόνο και τον ελεύθερο χρόνο
+    plt.text(-0.8, -1.2, f"Συνολικός Χρόνος: {total_hours} ώρες", fontsize=12, color='blue')
+    plt.text(-0.8, -1.4, f"Ελεύθερος Χρόνος: {free_time - total_hours} ώρες", fontsize=12, color='green')
+
+    plt.show()
+
+def plot_bar_chart(tasks, free_time, total_hours):
+    if not tasks:
+        print("Δεν υπάρχουν στόχοι για να δημιουργηθεί το γράφημα.")
+        return
+
+    # Δημιουργούμε λίστες για τα ονόματα των στόχων και τις ώρες που αφιερώνονται σε αυτούς
+    x = [task['name'] for task in tasks]  # Ονόματα στόχων
+    y = [task['hours'] for task in tasks]  # Ώρες για κάθε στόχο
+
+    plt.figure(figsize=(10, 6))
+    
+    # Δημιουργία γραφήματος στήλης με τις ώρες και τα ονόματα των στόχων
+    plt.bar(x, y, color='b')  
+    plt.title('Κατανομή Χρόνου ανά Στόχο')
+    plt.xlabel('Όνομα Στόχου')
+    plt.ylabel('Ώρες')
+    plt.xticks(rotation=45, ha='right')  # Ρύθμιση των τιμών του άξονα x με περιστροφή για καλύτερη ανάγνωση
+    plt.grid(axis='y')  # Προσθήκη γραμμών πλέγματος στον άξονα y
+
+    # Προσθήκη κειμένου για το συνολικό χρόνο και τον ελεύθερο χρόνο
+    plt.text(-1.5, max(y) + 1.3, f"Συνολικός Χρόνος: {total_hours} ώρες", fontsize=12, color='blue')
+    plt.text(-1.5, max(y) + 1.1, f"Ελεύθερος Χρόνος: {free_time - total_hours} ώρες", fontsize=12, color='green')
+
+    plt.tight_layout()  # Αυτόματη προσαρμογή για να μην κόβονται οι ετικέτες
+    plt.show()
 
 # Κύριος βρόχος του προγράμματος που εκτελεί το μενού και τις επιλογές του χρήστη
 while True:
     display_menu()  # Εμφανίζουμε το μενού επιλογών
-    user_input = int(input("Επέλεξε έναν αριθμό απο το 1-5: "))  # Ζητάμε από τον χρήστη να κάνει μια επιλογή
+    user_input = int(input("Επέλεξε έναν αριθμό απο το 1-9: "))  # Ζητάμε από τον χρήστη να κάνει μια επιλογή
     if user_input == 1:
         total_hours = task_add(tasks, total_hours)  # Καλούμε τη συνάρτηση για προσθήκη στόχου
     elif user_input == 2:
@@ -204,6 +270,10 @@ while True:
     elif user_input == 5:
         show_all()  # Καλούμε τη συνάρτηση για εμφάνιση όλων των στόχων
     elif user_input == 6:
-        average_time()
+        average_time()  # Καλούμε την συνάρτηση για τον υπολογισμό του μέσου όρου των ωρών των tasks
     elif user_input == 7:
+        plot_pie_chart(tasks, free_time, total_hours)  # Καλούμε τη συνάρτηση για το γράφημα πίτας
+    elif user_input == 8:
+        plot_bar_chart(tasks, free_time, total_hours)  # Καλούμε τη συνάρτηση για το γράφημα στήλης
+    elif user_input == 9:
         break  # Τερματίζουμε το πρόγραμμα όταν επιλεγεί η έξοδος
