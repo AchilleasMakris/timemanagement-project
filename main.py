@@ -1,40 +1,88 @@
 # Use pip install matplotlib to install the library
 import matplotlib.pyplot as plt
+# hashlib για να αποθηκεύουμε νέους χρήστες με κωδικό πρόσβασης
+import hashlib
+# getpass για να κρυφούν οι κωδικοί πρόσβασης με ****
+import getpass
+import csv
 
+users = {}  # Λεξικό για την αποθήκευση χρηστών και των στόχων τους
 tasks = []  # Λίστα που αποθηκεύει όλους τους στόχους
 total_hours = 0.0  # Μεταβλητή που αποθηκεύει τον συνολικό αριθμό ωρών που έχουν ανατεθεί στους στόχους
 free_time_flag = False  # Σημαία που δείχνει αν ο ελεύθερος χρόνος έχει οριστεί
 free_time = 0  # Αρχικοποιούμε τον ελεύθερο χρόνο σε 0
 
+def hash_password(password):
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def input_free_time():
+    while True:
+        try:
+            free_time = float(input("Δώσε τον ελεύθερο χρόνο που έχεις συνολικά για την εβδομάδα: "))
+            if not 1 <= free_time <= 168:  # Έλεγχος αν οι ώρες είναι μέσα στο όριο
+                raise ValueError("Δεν μπορείς να ξεπεράσεις τις 168 ώρες της εβδομάδας!")
+            return free_time
+        except ValueError:
+            print("Λάθος εισαγωγή για τον ελεύθερο χρόνο. Πρέπει να είναι αριθμός από 1 έως 168.")
+
+def input_or_update_free_time(current_user):
+    while True:
+        try:
+            free_time = float(input("Δώσε τον ελεύθερο χρόνο που έχεις συνολικά για την εβδομάδα: "))
+            if not 1 <= free_time <= 168:  # Έλεγχος αν οι ώρες είναι μέσα στο όριο
+                raise ValueError("Δεν μπορείς να ξεπεράσεις τις 168 ώρες της εβδομάδας!")
+            users[current_user]['free_time'] = free_time
+            print(f"Ο ελεύθερος χρόνος ενημερώθηκε σε {free_time} ώρες.")
+            break
+        except ValueError:
+            print("Λάθος εισαγωγή για τον ελεύθερο χρόνο. Πρέπει να είναι αριθμός από 1 έως 168.")
+
+def create_new_user():
+    username = input("Δώσε το όνομα χρήστη: ").strip()
+    if username in users:
+        print("Ο χρήστης υπάρχει ήδη.")
+    else:
+        password = getpass.getpass("Δώσε τον κωδικό πρόσβασης: ").strip()
+        password_hash = hash_password(password)
+        users[username] = {"password": password_hash, "tasks": [], "free_time": 168.0}  # Προεπιλεγμένος ελεύθερος χρόνος
+        print(f"Ο χρήστης {username} δημιουργήθηκε επιτυχώς.")
+
+def select_user():
+    username = input("Δώσε το όνομα χρήστη: ").strip()
+    if username in users:
+        password = getpass.getpass("Δώσε τον κωδικό πρόσβασης: ").strip()
+        if users[username]["password"] == hash_password(password):
+            print("Επιτυχής σύνδεση.")
+            return username
+        else:
+            print("Λάθος κωδικός πρόσβασης.")
+            return None
+    else:
+        print("Ο χρήστης δεν βρέθηκε.")
+        return None
+
 def display_menu():
     # Εμφανίζει το μενού επιλογών στον χρήστη
     print("\n--- Time Management ---")
-    print("1. Προσθήκη νέου στόχου")
-    print("2. Τροποποίηση στόχου")
-    print("3. Διαγραφή στόχου")
-    print("4. Ταξινόμιση κατά σημαντικότητα")
-    print("5. Εκτύπωση όλων των στόχων")
-    print("6. Μέσος όρος χρόνου των Task")
-    print("7. Γράφημα Πίτας")
-    print("8. Γράφημα Στηλών")
-    print("9. Έξοδος")
+    print("1. Εισαγωγή/Ενημέρωση Ελεύθερου Χρόνου")
+    print("2. Προσθήκη νέου στόχου")
+    print("3. Τροποίηση στόχου")
+    print("4. Διαγραφή στόχου")
+    print("5. Ταξινόμιση κατά σημαντικότητα")
+    print("6. Εκτύπωση όλων των στόχων")
+    print("7. Μέσος όρος χρόνου των Task")
+    print("8. Γράφημα Πίτας")
+    print("9. Γράφημα Στηλών")
+    print("10. Έξοδος")
 
-def task_add(tasks, total_hours):
-    global free_time, free_time_flag  # Δηλώνουμε τις μεταβλητές ως global για να τις τροποποιούμε
+def task_add(tasks, total_hours, current_user):
+    # Έλεγχος αν ο ελεύθερος χρόνος έχει οριστεί
+    if users[current_user]['free_time'] == 168.0:  # Αν είναι η προεπιλεγμένη τιμή, σημαίνει ότι δεν έχει οριστεί
+        print("Πρέπει πρώτα να ορίσεις τον ελεύθερο χρόνο σου για την εβδομάδα.")
+        input_or_update_free_time(current_user)
 
-    # Αν το free_time δεν έχει ρυθμιστεί, ζητάμε από τον χρήστη να το εισάγει
-    if not free_time_flag:
-        while True:
-            try:
-                free_time = float(input("Δώσε τον ελεύθερο χρόνο που έχεις συνολικά για την εβδομάδα: "))
-                if not 1 <= free_time <= 168:  # Έλεγχος αν οι ώρες είναι μέσα στο όριο
-                    raise ValueError("Δεν μπορείς να ξεπεράσεις τις 168 ώρες της εβδομάδας!")
-                free_time_flag = True  # Το flag τίθεται σε True όταν ο χρήστης δώσει σωστό ελεύθερο χρόνο
-                break
-            except ValueError:
-                print("Λάθος εισαγωγή για τον ελεύθερο χρόνο. Πρέπει να είναι αριθμός από 1 έως 168.")
+    free_time = users[current_user]['free_time']  # Χρησιμοποιούμε τον ελεύθερο χρόνο του χρήστη
 
-    # Λούπα για την προσθήκη νέου στόχου
     while True:
         try:
             name = input("Δώσε το όνομα του στόχου: ").strip()
@@ -66,7 +114,6 @@ def task_add(tasks, total_hours):
             if not (1 <= importance <= 10):
                 raise ValueError("Ο αριθμός πρέπει να είναι απο 1 - 10")
             
-        # Χρήση του e για να μην μπερδευτεί με τα άλλα σφάλματα
         except ValueError as e:
             print(e)  # Εκτύπωση του μηνύματος σφάλματος που προκλήθηκε
             continue
@@ -77,12 +124,17 @@ def task_add(tasks, total_hours):
         print(f"Task added: {name}, Hours: {hours}, Importance: {importance}")
         remaining_free_time = free_time - total_hours  # Υπολογισμός του υπολειπόμενου ελεύθερου χρόνου
         print(f"Απομένουν {remaining_free_time} ώρες ελεύθερου χρόνου.")
+        
+        # Αποθήκευση των tasks στο αρχείο CSV
+        save_tasks_to_csv(current_user)
+
         break
 
     return total_hours
 
-def task_edit():
+def task_edit(current_user):
     global total_hours  # Για να αλλάξουμε τη συνολική διάρκεια των tasks
+    tasks = users[current_user]['tasks']
 
     if not tasks:
         print("Δεν υπάρχουν στόχοι για τροποποίηση.")
@@ -137,8 +189,12 @@ def task_edit():
     total_hours += current_task['hours']
     print("Η τροποποίηση ολοκληρώθηκε επιτυχώς.")
 
-def task_del():
-    global total_hours  # Χρειάζεται για να ενημερώσουμε τις συνολικές ώρες
+    # Αποθήκευση των tasks στο αρχείο CSV
+    save_tasks_to_csv(current_user)
+
+def task_del(current_user):
+    global total_hours
+    tasks = users[current_user]['tasks']
 
     if not tasks:
         print("Δεν υπάρχουν στόχοι για διαγραφή.")
@@ -165,13 +221,18 @@ def task_del():
 
     print("Το Task διαγράφηκε επιτυχώς.")
 
-def sort_by_importance():
+    # Αποθήκευση των tasks στο αρχείο CSV
+    save_tasks_to_csv(current_user)
+
+def sort_by_importance(current_user):
+    tasks = users[current_user]['tasks']
     print("\nΈγινε η ταξινόμιση με βάση του πόσο σημαντικό είναι το κάθε Task.\n")
     tasks.sort(key=lambda x: x['importance'], reverse=True)  # Ταξινόμηση των tasks κατά σημαντικότητα (φθίνουσα σειρά)
     for i, task in enumerate(tasks):
         print(f"{i + 1}. {task['name']} (Importance: {task['importance']}, Hours: {task['hours']})")
 
-def show_all():
+def show_all(current_user):
+    tasks = users[current_user]['tasks']
     # Ελέγχουμε αν δεν υπάρχουν tasks στον κατάλογο
     if not tasks:
         print("Δεν υπάρχουν στόχοι.")  # Εκτυπώνουμε μήνυμα αν δεν υπάρχουν tasks
@@ -185,7 +246,8 @@ def show_all():
 
         #TODO PRINT TOTAL FREE TIME
 
-def average_time():
+def average_time(current_user):
+    tasks = users[current_user]['tasks']
     if not tasks:
         print("\nΔεν έχουν υποβληθεί Tasks.\n")
         return
@@ -200,7 +262,11 @@ def average_time():
         average = total_hours / len(tasks)  
         print(f"Ο μέσος όρος των Tasks της εβδομάδας είναι: {average:.2f} ώρες")
 
-def plot_pie_chart(tasks, free_time, total_hours):
+def calculate_total_hours(tasks):
+    return sum(task['hours'] for task in tasks)
+
+def plot_pie_chart(tasks, free_time):
+    total_hours = calculate_total_hours(tasks)
     if not tasks:
         print("Δεν υπάρχουν στόχοι για να δημιουργηθεί το γράφημα.")
         return
@@ -225,12 +291,13 @@ def plot_pie_chart(tasks, free_time, total_hours):
     plt.title('Κατανομή Χρόνου στους Στόχους')
 
     # Προσθήκη κειμένου για το συνολικό χρόνο και τον ελεύθερο χρόνο
-    plt.text(-0.8, -1.2, f"Συνολικός Χρόνος: {total_hours} ώρες", fontsize=12, color='blue')
-    plt.text(-0.8, -1.4, f"Ελεύθερος Χρόνος: {free_time - total_hours} ώρες", fontsize=12, color='green')
+    plt.text(-1.5, 1.0, f"Συνολικός Χρόνος: {total_hours} ώρες", fontsize=12, color='blue', ha='left')
+    plt.text(-1.5, 0.8, f"Ελεύθερος Χρόνος: {free_time - total_hours} ώρες", fontsize=12, color='green', ha='left')
 
     plt.show()
 
-def plot_bar_chart(tasks, free_time, total_hours):
+def plot_bar_chart(tasks, free_time):
+    total_hours = calculate_total_hours(tasks)
     if not tasks:
         print("Δεν υπάρχουν στόχοι για να δημιουργηθεί το γράφημα.")
         return
@@ -256,25 +323,102 @@ def plot_bar_chart(tasks, free_time, total_hours):
     plt.tight_layout()  # Αυτόματη προσαρμογή για να μην κόβονται οι ετικέτες
     plt.show()
 
-# Κύριος βρόχος του προγράμματος που εκτελεί το μενού και τις επιλογές του χρήστη
-while True:
-    display_menu()  # Εμφανίζουμε το μενού επιλογών
-    user_input = int(input("Επέλεξε έναν αριθμό απο το 1-9: "))  # Ζητάμε από τον χρήστη να κάνει μια επιλογή
-    if user_input == 1:
-        total_hours = task_add(tasks, total_hours)  # Καλούμε τη συνάρτηση για προσθήκη στόχου
-    elif user_input == 2:
-        task_edit()  # Καλούμε τη συνάρτηση για τροποποίηση στόχου
-    elif user_input == 3:
-        task_del()  # Καλούμε τη συνάρτηση για διαγραφή στόχου
-    elif user_input == 4:
-        sort_by_importance()  # Καλούμε τη συνάρτηση για ταξινόμηση κατά σημαντικότητα
-    elif user_input == 5:
-        show_all()  # Καλούμε τη συνάρτηση για εμφάνιση όλων των στόχων
-    elif user_input == 6:
-        average_time()  # Καλούμε την συνάρτηση για τον υπολογισμό του μέσου όρου των ωρών των tasks
-    elif user_input == 7:
-        plot_pie_chart(tasks, free_time, total_hours)  # Καλούμε τη συνάρτηση για το γράφημα πίτας
-    elif user_input == 8:
-        plot_bar_chart(tasks, free_time, total_hours)  # Καλούμε τη συνάρτηση για το γράφημα στήλης
-    elif user_input == 9:
-        break  # Τερματίζουμε το πρόγραμμα όταν επιλεγεί η έξοδος
+def save_users_to_csv(filename='users.csv'):
+    with open(filename, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        for username, data in users.items():
+            writer.writerow([username, data['password'], data['free_time']])
+
+def load_users_from_csv(filename='users.csv'):
+    try:
+        with open(filename, mode='r', newline='') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if len(row) == 3:
+                    username, password_hash, free_time = row
+                    users[username] = {"password": password_hash, "tasks": [], "free_time": float(free_time)}
+                elif len(row) == 2:
+                    # Αν λείπει ο ελεύθερος χρόνος, θέσε μια προεπιλεγμένη τιμή
+                    username, password_hash = row
+                    users[username] = {"password": password_hash, "tasks": [], "free_time": 168.0}  # Προεπιλεγμένος ελεύθερος χρόνος
+    except FileNotFoundError:
+        print("Το αρχείο χρηστών δεν βρέθηκε. Δημιουργία νέου αρχείου.")
+
+def save_tasks_to_csv(username, filename='tasks.csv'):
+    with open(filename, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        for task in users[username]['tasks']:
+            writer.writerow([username, task['name'], task['hours'], task['importance']])
+
+def load_tasks_from_csv(filename='tasks.csv'):
+    try:
+        with open(filename, mode='r', newline='') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                username, name, hours, importance = row
+                if username in users:
+                    users[username]['tasks'].append({
+                        "name": name,
+                        "hours": float(hours),
+                        "importance": int(importance)
+                    })
+    except FileNotFoundError:
+        print("Το αρχείο στόχων δεν βρέθηκε. Δημιουργία νέου αρχείου.")
+
+def main():
+    global total_hours  # Δηλώνουμε τη μεταβλητή ως global για να μπορούμε να την τροποποιήσουμε
+    load_users_from_csv()
+    load_tasks_from_csv()
+
+    while True:
+        print("\n--- Καλώς ήρθατε στο Time Management ---")
+        print("1. Εγγραφή νέου χρήστη")
+        print("2. Σύνδεση")
+        print("3. Έξοδος")
+        
+        choice = input("Επέλεξε μια επιλογή (1-3): ").strip()
+        
+        if choice == '1':
+            create_new_user()
+        elif choice == '2':
+            current_user = select_user()
+            if current_user:
+                # Αν ο χρήστης συνδεθεί επιτυχώς, εμφανίζουμε το μενού
+                while True:
+                    display_menu()
+                    user_input = int(input("Επέλεξε έναν αριθμό από το 1-10: "))
+                    if user_input == 1:
+                        input_or_update_free_time(current_user)
+                    elif user_input == 2:
+                        total_hours = task_add(users[current_user]['tasks'], total_hours, current_user)
+                    elif user_input == 3:
+                        task_edit(current_user)
+                    elif user_input == 4:
+                        task_del(current_user)
+                    elif user_input == 5:
+                        sort_by_importance(current_user)
+                    elif user_input == 6:
+                        show_all(current_user)
+                    elif user_input == 7:
+                        average_time(current_user)
+                    elif user_input == 8:
+                        plot_pie_chart(users[current_user]['tasks'], users[current_user]['free_time'])
+                    elif user_input == 9:
+                        plot_bar_chart(users[current_user]['tasks'], users[current_user]['free_time'])
+                    elif user_input == 10:
+                        break
+        elif choice == '3':
+            break
+        else:
+            print("Παρακαλώ επέλεξε μια έγκυρη επιλογή.")
+
+    # Στο τέλος του προγράμματος ή μετά από αλλαγές
+    save_users_to_csv()
+    save_tasks_to_csv(current_user)
+
+if __name__ == "__main__":
+    # Κάλεσε αυτές τις συναρτήσεις στην αρχή και στο τέλος του προγράμματος
+    load_users_from_csv()
+    load_tasks_from_csv()
+
+    main()
