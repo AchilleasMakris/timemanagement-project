@@ -254,13 +254,18 @@ def show_all(current_user):
         None
     """
     tasks = users[current_user]['tasks']
+    free_time = users[current_user]['free_time']
     if not tasks:
         print("Δεν υπάρχουν στόχοι.")
         return
     print("\n--- Όλοι οι στόχοι ---")
     for i, task in enumerate(tasks):
         print(f"{i + 1}. Όνομα: {task['name']}, Διάρκεια: {task['hours']} ώρες, Σημαντικότητα: {task['importance']}")
-    print(f"Συνολικός ελεύθερος χρόνος: {users[current_user]['free_time']} ώρες")
+    total_task_hours = sum(task['hours'] for task in tasks)  # Υπολογισμός σύνολο ωρών στόχων
+    remaining_free_time = free_time - total_task_hours       # Υπολογισμός ελεύθερου χρόνου που απομένει
+    print(f"Συνολικός ελεύθερος χρόνος: {free_time} ώρες")
+    print(f"Ελεύθερος χρόνος που απομένει: {remaining_free_time} ώρες")
+    
 
 def average_time(current_user):
     """
