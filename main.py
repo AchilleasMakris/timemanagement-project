@@ -4,16 +4,14 @@ import matplotlib.pyplot as plt
 import hashlib
 # getpass για να κρυφούν οι κωδικοί πρόσβασης με ****
 import getpass
+# csv για διάβσμα CSV Αρχείων
 import csv
 
 users = {}  # Λεξικό για την αποθήκευση χρηστών και των στόχων τους
 tasks = []  # Λίστα που αποθηκεύει όλους τους στόχους
 total_hours = 0.0  # Μεταβλητή που αποθηκεύει τον συνολικό αριθμό ωρών που έχουν ανατεθεί στους στόχους
-free_time_flag = False  # Σημαία που δείχνει αν ο ελεύθερος χρόνος έχει οριστεί
 free_time = 0  # Αρχικοποιούμε τον ελεύθερο χρόνο σε 0
-
-import hashlib
-import getpass
+free_time_set = False
 
 def hash_password(password):
     """
@@ -28,27 +26,36 @@ def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 
-def input_free_time():
+def input_or_update_free_time(current_user):
     """
-    Ζητά από τον χρήστη να εισαγάγει τον συνολικό ελεύθερο χρόνο του για την εβδομάδα.
-    Διασφαλίζει ότι η είσοδος είναι έγκυρη και εντός των λογικών ορίων (1-168 ώρες).
-
-    Returns:
-        float: Ο αριθμός των ωρών που δηλώνει ο χρήστης ως διαθέσιμες για τη διαχείριση του χρόνου του.
+    Επιτρέπει στον χρήστη να εισαγάγει ή να ενημερώσει τον διαθέσιμο ελεύθερο χρόνο του.
+    Ελέγχει αν η είσοδος είναι έγκυρη και αν η νέα τιμή είναι αρκετή για τα υπάρχοντα tasks.
     """
+    # Υπολογισμός του τρέχοντος συνόλου ωρών από τα tasks
+    current_tasks = users[current_user]['tasks']
+    total_task_hours = sum(task['hours'] for task in current_tasks)
+    
     while True:
         try:
             free_time = float(input("Δώσε τον ελεύθερο χρόνο που έχεις συνολικά για την εβδομάδα: "))
             
-            # Έλεγχος εγκυρότητας δεδομένων (ο χρόνος πρέπει να είναι μεταξύ 1 και 168 ωρών)
+            # Έλεγχος εγκυρότητας δεδομένων
             if not 1 <= free_time <= 168:
                 raise ValueError("Δεν μπορείς να ξεπεράσεις τις 168 ώρες της εβδομάδας!")
             
-            return free_time
+            # Έλεγχος αν το νέο free_time είναι μικρότερο από τις υπάρχουσες ώρες tasks
+            if free_time < total_task_hours:
+                print(f"Σφάλμα: Έχεις ήδη {total_task_hours} ώρες σε tasks. "
+                      f"Το νέο ελεύθερο χρόνο πρέπει να είναι τουλάχιστον {total_task_hours} ώρες.")
+                continue
+            
+            users[current_user]['free_time'] = free_time
+            print(f"Ο ελεύθερος χρόνος ενημερώθηκε σε {free_time} ώρες.")
+            save_users_to_csv()  # Αποθήκευση αμέσως μετά την ενημέρωση
+            break
         
         except ValueError:
             print("Λάθος εισαγωγή για τον ελεύθερο χρόνο. Πρέπει να είναι αριθμός από 1 έως 168.")
-
 
 def input_or_update_free_time(current_user):
     """
@@ -102,22 +109,16 @@ def create_new_user():
 
 
 def select_user():
-    """
-    Επιτρέπει σε έναν χρήστη να συνδεθεί στο σύστημα εισάγοντας όνομα χρήστη και κωδικό πρόσβασης.
-    Ελέγχει τα στοιχεία και επιστρέφει το όνομα του χρήστη αν η σύνδεση είναι επιτυχής.
-
-    Returns:
-        str or None: Το όνομα του χρήστη αν η σύνδεση είναι επιτυχής, διαφορετικά None.
-    """
     username = input("Δώσε το όνομα χρήστη: ").strip()
-
-    # Έλεγχος αν ο χρήστης υπάρχει
     if username in users:
         password = getpass.getpass("Δώσε τον κωδικό πρόσβασης: ").strip()
-
-        # Έλεγχος αν ο κωδικός πρόσβασης είναι σωστός
         if users[username]["password"] == hash_password(password):
             print("Επιτυχής σύνδεση.")
+            # Υπολογισμός του συνολικού χρόνου των tasks
+            total_task_hours = sum(task["hours"] for task in users[username]["tasks"])
+            # Υπολογισμός του υπόλοιπου ελεύθερου χρόνου
+            remaining_free_time = users[username]["free_time"] - total_task_hours
+            print(f"Ο υπόλοιπος ελεύθερος χρόνος σου είναι: {remaining_free_time} ώρες")
             return username
         else:
             print("Λάθος κωδικός πρόσβασης.")
@@ -125,7 +126,7 @@ def select_user():
     else:
         print("Ο χρήστης δεν βρέθηκε.")
         return None
-
+    
 
 def display_menu():
     """
@@ -416,39 +417,17 @@ def sort_by_importance(current_user):
 
 
 def show_all(current_user):
-    """
-    Εμφανίζει τη λίστα με όλους τους στόχους (tasks) του συνδεδεμένου χρήστη.
-    
-    Η συνάρτηση:
-    - Ελέγχει αν υπάρχουν καταχωρημένοι στόχοι. Αν όχι, εμφανίζει σχετικό μήνυμα.
-    - Εμφανίζει τη λίστα των tasks μαζί με τις ώρες και τη σημαντικότητά τους.
-    - Προαιρετικά, μπορεί να προστεθεί εμφάνιση του συνολικού διαθέσιμου ελεύθερου χρόνου.
-
-    Args:
-        current_user (str): Το όνομα του συνδεδεμένου χρήστη.
-
-    Returns:
-        None
-    """
-
-    # Ανάκτηση της λίστας των tasks του χρήστη
-    tasks = users[current_user]['tasks']
-
-    # Έλεγχος αν η λίστα είναι κενή
+    tasks = users[current_user]["tasks"]
     if not tasks:
         print("Δεν υπάρχουν στόχοι.")
-        return  # Διακοπή της εκτέλεσης αν δεν υπάρχουν καταχωρημένα tasks
-
-    # Εμφάνιση τίτλου πριν την εκτύπωση των tasks
+        return
     print("\n--- Όλοι οι στόχοι ---")
-
-    # Διατρέχουμε όλα τα tasks χρησιμοποιώντας enumerate για αρίθμηση
     for i, task in enumerate(tasks):
         print(f"{i + 1}. Όνομα: {task['name']}, Διάρκεια: {task['hours']} ώρες, Σημαντικότητα: {task['importance']}")
-
-    # TODO: Εκτύπωση συνολικού ελεύθερου χρόνου του χρήστη
-    print(f"Συνολικός ελεύθερος χρόνος: {users[current_user]['free_time']} ώρες")
-
+    total_task_hours = sum(task["hours"] for task in tasks)
+    remaining_free_time = users[current_user]["free_time"] - total_task_hours
+    print(f"Υπόλοιπος ελεύθερος χρόνος: {remaining_free_time} ώρες")
+    
 
 def average_time(current_user):
     """
@@ -677,67 +656,23 @@ def load_users_from_csv(filename='users.csv'):
     except FileNotFoundError:
         print("Το αρχείο χρηστών δεν βρέθηκε. Δημιουργία νέου αρχείου.")
 
-def save_tasks_to_csv(username, filename='tasks.csv'):
-    """
-    Αποθηκεύει τα tasks ενός συγκεκριμένου χρήστη σε αρχείο CSV.
-
-    Η συνάρτηση:
-    - Ανοίγει το αρχείο CSV σε λειτουργία εγγραφής ('w'), αντικαθιστώντας τυχόν προηγούμενα δεδομένα.
-    - Γράφει κάθε task του χρήστη ως ξεχωριστή γραμμή στο αρχείο, αποθηκεύοντας:
-      - Το όνομα χρήστη
-      - Το όνομα του task
-      - Τις ώρες που έχουν αφιερωθεί στο task
-      - Τη σημαντικότητα του task
-
-    Args:
-        username (str): Το όνομα του χρήστη του οποίου τα tasks θα αποθηκευτούν.
-        filename (str): Το όνομα του αρχείου CSV στο οποίο θα γίνει η αποθήκευση. 
-                        Προεπιλεγμένη τιμή: 'tasks.csv'.
-
-    Returns:
-        None
-    """
+def save_tasks_to_csv(filename='tasks.csv'):
     with open(filename, mode='w', newline='') as file:
         writer = csv.writer(file)
-
-        # Ελέγχουμε αν ο χρήστης υπάρχει στη λίστα χρηστών και αν έχει καταχωρημένα tasks
-        if username in users and users[username]['tasks']:
+        for username in users:
             for task in users[username]['tasks']:
                 writer.writerow([username, task['name'], task['hours'], task['importance']])
-        else:
-            print(f"Ο χρήστης '{username}' δεν έχει tasks προς αποθήκευση.")
 
-        writer = csv.writer(file)
-        for task in users[username]['tasks']:
-            writer.writerow([username, task['name'], task['hours'], task['importance']])
 
 def load_tasks_from_csv(filename='tasks.csv'):
-    """
-    Φορτώνει τα tasks των χρηστών από ένα αρχείο CSV και τα αποθηκεύει στη δομή δεδομένων users.
-
-    Η συνάρτηση:
-    - Προσπαθεί να ανοίξει το αρχείο CSV σε λειτουργία ανάγνωσης ('r').
-    - Διαβάζει κάθε γραμμή του αρχείου, η οποία περιέχει:
-      - Το όνομα χρήστη
-      - Το όνομα του task
-      - Τις ώρες που έχουν αφιερωθεί στο task
-      - Τη σημαντικότητα του task
-    - Αν ο χρήστης υπάρχει ήδη στη δομή users, προσθέτει το task στη λίστα του.
-    - Αν το αρχείο δεν βρεθεί, εμφανίζει κατάλληλο μήνυμα και δεν εκτελείται καμία φόρτωση.
-
-    Args:
-        filename (str): Το όνομα του αρχείου CSV από το οποίο θα διαβαστούν τα tasks.
-                        Προεπιλεγμένη τιμή: 'tasks.csv'.
-
-    Returns:
-        None
-    """
     try:
+        # Καθαρισμός των tasks όλων των χρηστών πριν τη φόρτωση
+        for username in users:
+            users[username]['tasks'] = []
         with open(filename, mode='r', newline='') as file:
             reader = csv.reader(file)
-
             for row in reader:
-                if len(row) == 4:  # Έλεγχος αν η γραμμή έχει τα αναμενόμενα πεδία
+                if len(row) == 4:
                     username, name, hours, importance = row
                     if username in users:
                         users[username]['tasks'].append({
@@ -745,16 +680,11 @@ def load_tasks_from_csv(filename='tasks.csv'):
                             "hours": float(hours),
                             "importance": int(importance)
                         })
-                    else:
-                        print(f"Προειδοποίηση: Ο χρήστης '{username}' δεν βρέθηκε στη βάση δεδομένων.")
-                else:
-                    print("Σφάλμα: Εσφαλμένη μορφή δεδομένων στο αρχείο CSV.")
-
     except FileNotFoundError:
         print("Το αρχείο στόχων δεν βρέθηκε. Δημιουργία νέου αρχείου.")
 
 def main():
-    global total_hours  # Δηλώνουμε τη μεταβλητή ως global για να μπορούμε να την τροποποιήσουμε
+    global total_hours
     load_users_from_csv()
     load_tasks_from_csv()
 
@@ -763,20 +693,29 @@ def main():
         print("1. Εγγραφή νέου χρήστη")
         print("2. Σύνδεση")
         print("3. Έξοδος")
-        
+
         choice = input("Επέλεξε μια επιλογή (1-3): ").strip()
-        
+
         if choice == '1':
             create_new_user()
+            save_users_to_csv()
         elif choice == '2':
             current_user = select_user()
             if current_user:
-                # Αν ο χρήστης συνδεθεί επιτυχώς, εμφανίζουμε το μενού
+                total_hours = calculate_total_hours(users[current_user]['tasks'])
+                
                 while True:
                     display_menu()
-                    user_input = int(input("Επέλεξε έναν αριθμό από το 1-10: "))
+                    try:
+                        user_input = int(input("Επέλεξε έναν αριθμό από το 1-10: "))
+                    except ValueError:
+                        print("Παρακαλώ εισάγετε έναν έγκυρο αριθμό.")
+                        continue
+
                     if user_input == 1:
                         input_or_update_free_time(current_user)
+                    elif user_input == 10:
+                        break
                     elif user_input == 2:
                         total_hours = task_add(users[current_user]['tasks'], total_hours, current_user)
                     elif user_input == 3:
@@ -793,20 +732,18 @@ def main():
                         plot_pie_chart(users[current_user]['tasks'], users[current_user]['free_time'])
                     elif user_input == 9:
                         plot_bar_chart(users[current_user]['tasks'], users[current_user]['free_time'])
-                    elif user_input == 10:
-                        break
+                    else:
+                        print("Παρακαλώ επέλεξε έναν αριθμό από 1 έως 10.")
         elif choice == '3':
+            save_users_to_csv()
+            save_tasks_to_csv()
             break
         else:
             print("Παρακαλώ επέλεξε μια έγκυρη επιλογή.")
 
-    # Στο τέλος του προγράμματος ή μετά από αλλαγές
     save_users_to_csv()
-    save_tasks_to_csv(current_user)
+    if 'current_user' in locals():
+        save_tasks_to_csv(current_user)
 
 if __name__ == "__main__":
-    # Κάλεσε αυτές τις συναρτήσεις στην αρχή και στο τέλος του προγράμματος
-    load_users_from_csv()
-    load_tasks_from_csv()
-
-    main()
+    main()  # Καλέστε μόνο τη main, όχι τις load_ συναρτήσεις ξανά
