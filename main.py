@@ -265,7 +265,7 @@ def show_all(current_user):
     remaining_free_time = free_time - total_task_hours       # Υπολογισμός ελεύθερου χρόνου που απομένει
     print(f"Συνολικός ελεύθερος χρόνος: {free_time} ώρες")
     print(f"Ελεύθερος χρόνος που απομένει: {remaining_free_time} ώρες")
-    
+
 
 def average_time(current_user):
     """
@@ -296,12 +296,22 @@ def plot_pie_chart(tasks, free_time):
     Returns:
         None
     """
+    # Έλεγχος αν υπάρχουν tasks
     if not tasks:
         print("Δεν υπάρχουν στόχοι για απεικόνιση.")
         return
+    
+    # Δημιουργία λιστών για ετικέτες και μεγέθη
     labels = [task['name'] for task in tasks] + ["Ελεύθερος χρόνος"]
     sizes = [task['hours'] for task in tasks] + [free_time - sum(task['hours'] for task in tasks)]
-    plt.pie(sizes, labels=labels, autopct='%1.1f%%')
+    
+    # Προσαρμοσμένη συνάρτηση για εμφάνιση ωρών
+    def autopct_format(pct, allvals):
+        absolute = int(pct / 100. * sum(allvals))
+        return f"{absolute} ώρες"
+    
+    # Δημιουργία γράφηματος πίτας
+    plt.pie(sizes, labels=labels, autopct=lambda pct: autopct_format(pct, sizes))
     plt.title("Κατανομή Χρόνου")
     plt.show()
 
