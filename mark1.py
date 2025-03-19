@@ -1,5 +1,5 @@
 """"
-ttttttttt
+
 # Time management
 # Εισαγωγή tkinter
 
