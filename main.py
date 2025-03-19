@@ -266,7 +266,6 @@ def show_all(current_user):
     print(f"Συνολικός ελεύθερος χρόνος: {free_time} ώρες")
     print(f"Ελεύθερος χρόνος που απομένει: {remaining_free_time} ώρες")
 
-
 def average_time(current_user):
     """
     Υπολογίζει και εμφανίζει τον μέσο όρο των ωρών που αφιερώνονται στα tasks.
@@ -382,6 +381,7 @@ def load_users_from_csv(filename='users.csv'):
                         "tasks": [],
                         "free_time": 168.0
                     }
+                #TODO Remove the default 168 free_time
     except FileNotFoundError:
         print("Το αρχείο χρηστών δεν βρέθηκε. Δημιουργία νέου αρχείου.")
 
