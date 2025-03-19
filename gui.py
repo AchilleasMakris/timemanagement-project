@@ -1,7 +1,7 @@
 import customtkinter
 from tkinter import *
 from CTkMessagebox import CTkMessagebox
-from main import load_users_from_csv, users, hash_password, select_user, create_new_user
+from main import *
 
 # Set initial appearance mode to light
 customtkinter.set_appearance_mode("light")
@@ -22,10 +22,7 @@ def clear_window():
         widget.destroy()
 
 
-frame = customtkinter.CTkFrame(master=app,
-                               width=350,
-                               height=250,
-                               corner_radius=10)
+frame = customtkinter.CTkFrame(master=app, width=350, height=250, corner_radius=10)
 frame.pack(padx=20, pady=20)
 
 
@@ -43,41 +40,18 @@ switch_1 = customtkinter.CTkSwitch(master=app, text="Display Mode", command=swit
 switch_1.place(relx=1.0, rely=0.0, anchor='ne', x=-10, y=10)
 
 
-
-username_entry = customtkinter.CTkEntry(master=frame,
-                                        placeholder_text="Username",
-                                        width=200,
-                                        height=30,
-                                        corner_radius=10)
+username_entry = customtkinter.CTkEntry(master=frame, placeholder_text="Username", width=200, height=30, corner_radius=10)
 username_entry.place(relx=0.5, rely=0.2, anchor=CENTER)
 
-
-
-password_entry = customtkinter.CTkEntry(master=frame,
-                                        placeholder_text="Password",
-                                        width=200,
-                                        height=30,
-                                        show="*",
-                                        corner_radius=10)
-
+password_entry = customtkinter.CTkEntry(master=frame, placeholder_text="Password", width=200, height=30,show="*", corner_radius=10)
 password_entry.place(relx=0.5, rely=0.4, anchor=CENTER)
 
 # Place the Login button
-login = customtkinter.CTkButton(master=frame,
-                                 text="Login",
-                                 width=100,
-                                 height=30,
-                                 corner_radius=10, command=select_user)
-
+login = customtkinter.CTkButton(master=frame,text="Login", width=100, height=30, corner_radius=10, command=select_user)
 login.place(relx=0.35, rely=0.6, anchor=CENTER)
 
 # Place the Register button next to the Login button
-register = customtkinter.CTkButton(master=frame,
-                                    text="Register",
-                                    width=100,
-                                    height=30,
-                                    corner_radius=10, command=create_new_user)
-
+register = customtkinter.CTkButton(master=frame, text="Register", width=100, height=30, corner_radius=10, command=create_new_user)
 register.place(relx=0.65, rely=0.6, anchor=CENTER)
 
 def select_user():
