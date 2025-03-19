@@ -159,11 +159,22 @@ def task_edit(current_user):
     if not tasks:
         print("Δεν υπάρχουν στόχοι για τροποποίηση.")
         return
+    
     print("Επέλεξε το Task που θέλεις να τροποποιήσεις: ")
+
     for i, task in enumerate(tasks):
         print(f"{i + 1}. {task['name']}")
+    print("Επέλεξε 0 για να πας στο αρχικό μενού.")
+ 
+
     try:
         task_index = int(input("Δώσε τον αριθμό του Task που θέλεις να κάνεις τροποποίηση: ")) - 1
+        #TODO Fix the indexing so we dont subtract 1
+        # αν ο χρήστης εισάγει 0, τότε πάει στο αρχικό μενού.
+        # βάλαμε -1 επειδή αφαιρούμε 1 απο το task_index....
+        if task_index == -1:
+            print("Επιστροφή στο αρχικό μενού.")
+            return
         if task_index < 0 or task_index >= len(tasks):
             print("Άκυρη επιλογή, παρακαλώ δώστε έναν αριθμό από τη λίστα.")
             return
@@ -213,10 +224,16 @@ def task_del(current_user):
         print("Δεν υπάρχουν στόχοι για διαγραφή.")
         return
     print("Επέλεξε το Task που θέλεις να διαγράψεις: ")
+
     for i, task in enumerate(tasks):
         print(f"{i + 1}. {task['name']}")
+    print("Επέλεξε 0 για να πας στο αρχικό μενού.")
+
     try:
         task_index = int(input("Δώσε τον αριθμό του Task που θέλεις να διαγράψεις: ")) - 1
+        if task_index == -1:
+            print("Επιστροφή στο αρχικό μενού.")
+            return
         if task_index < 0 or task_index >= len(tasks):
             print("Άκυρη επιλογή, παρακαλώ δώστε έναν αριθμό από τη λίστα.")
             return
@@ -374,14 +391,6 @@ def load_users_from_csv(filename='users.csv'):
                         "tasks": [],
                         "free_time": float(free_time)
                     }
-                elif len(row) == 2:
-                    username, password_hash = row
-                    users[username] = {
-                        "password": password_hash,
-                        "tasks": [],
-                        "free_time": 168.0
-                    }
-                #TODO Remove the default 168 free_time
     except FileNotFoundError:
         print("Το αρχείο χρηστών δεν βρέθηκε. Δημιουργία νέου αρχείου.")
 
