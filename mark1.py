@@ -35,6 +35,16 @@
 
 Το κανω exe:
 pyinstaller main.py --onefile -w(για να μην εχει το terminal οταν εχω gui)
+
+TODO: Συναρτήσεις για εισαγωγές , Επιπλέον επιλογή στο κεντρικό μενού για προβολή του διαθέσιμου χρόνου
+20/03/2025:
+- Προσθήκη παραμέτρου x στην epilogi() για κλήση με μεταβλητό άνω όριο
+- Προσθήκη της terminate, ελέγχει αν ο συνολικός ελεύθερος χρόνος μηδενίζεται συνέπεια των διαδοχικών αφαιρέσεων απο τις εισαγωγές δραστηριοτήτων. Αν terminate = True τότε δεν μπορώ να μπώ στην διαδικασία εισαγωγής νέας συνάρτησης.
+- Προσθήκη συναρτήσεων για:
+    1) Εισαγωγή ονόματος
+    2) Εισαγωγή ελεύθερου χρόνου
+    3) Προβολή του ελεύθερου χρόνου
+    4) Εισαγωγή βαθμού σημαντικότητας
 """
 
 # Αρχικοποιήσεις
@@ -59,12 +69,12 @@ def display_menu():
     print("5. Έξοδος")
 
 # Eπιλογή λειτουργίας
-def epilogi():
+def epilogi(x):
     while True:
         try:
             epilogi = input("Επέλεξε μια απο τις παραπάνω λειτουργείες: ").strip()
             epilogi = int(epilogi)
-            if 1<= epilogi <= 5:
+            if 1<= epilogi <= x:
                 return epilogi
                 break
             else:
@@ -72,86 +82,137 @@ def epilogi():
         except ValueError:
             print ("Mή έγκυρη τιμή.")
 
-# Προσθήκη δραστηριότητας
-def add_activity(total_hours , activities):
-    
-    while True:
-        
-    # Eπιλογή τύπου δραστηριότητας, 1 για Υποχρέωση ή 2 για Χόμπι.
-        while True:
-            try:
-                choice = int(input(("Πληκτρολογείστε 1 για Υποχρέωση ή 2 για Χόμπι: ")))
-                if choice in [1,2]:
-                    break
-                print("Η επιλογή δεν υπάρχει. Παρακαλώ προσπαθήστε ξανά.")
-            except ValueError:
-                print("Μη έγκυρη είσοδος.")
-        
-            
+# Συνάρτηση εισαγωγής ονόματος
+def name():
+    """Εισάγει / τροποποιεί το όνομα της δραστηριότητας"""
 
     # Εισαγωγή ονόματος, αφαιρώ τα κενά space πρίν και μετά το όνομα. 
-        onoma = input("Δώστε το όνομα της δραστηριότητας: ").strip()
+    onoma = input("Δώστε το όνομα της δραστηριότητας: ").strip()
             
-        """"
+    """"
         Έλεγχος ονόματος, αν δωθεί το κενό τότε το διαγράφω με την strip επομένως onoma = False και μπαίνω στην επανάληψη
         ή αν κανένα απο τα στοιχεία του ονόματος δεν είναι χαρακτήρας.
-        """
-        while not onoma or not any(char.isalpha() for char in onoma):
-            onoma = input("Το όνομα της δραστηριότητας δεν μπορεί να είναι κενό ή αριθμός, παρακαλώ επανεισάγετε το όνομα: ").strip()
-            
-     
-    #Εισαγωγή διάρκειας δραστηριότητας
+    """
+    while not onoma or not any(char.isalpha() for char in onoma):
+        onoma = input("Το όνομα της δραστηριότητας δεν μπορεί να είναι κενό ή αριθμός, παρακαλώ επανεισάγετε το όνομα: ").strip()
+    return onoma
 
-        # αν οι συνολικές διαθέσιμες ώρες είναι 0 , εισαγωγή των ωρών πρώτα
-        if total_hours == 0:
+# Εισαγωγή συνολικού ελεύθερου χρόνου
+def eleutheros_xronos():
+    """Εισάγει τον ελεύθερο χρόνο"""
+    while True:
+        try:
+            total_hours = input("Παρακαλώ εισάγετε τις συνολικές ώρες που έχετε διαθέσιμες για αυτήν την εβδομάδα: ").strip()
+            total_hours = float(total_hours)
+            if total_hours and 0 <= total_hours <= 168:
+                return total_hours
+            else:
+                print("Οι συνολικές διαθέσιμές ώρες δεν μπορούν να είναι αρνητικός αριθμός ή περισσότερες από τις 168 ώρες της εβδομάδας.")
+        except ValueError:
+            print ("Μή έγκυρη είσοδος. Παρακαλώ εισάγετε τον αριθμό των διαθέσιμων ωρών.")
+
+# Εμφάνιση του συνολικού ελεύθερου χρόνου
+def display_FreeTime(x):
+    """Προβάλει τον διαθέσιμο ελεύθερο χρόνο"""
+    print("Ο συνολικός ελεύθερος χρόνος για αυτή την εβδομάδα είναι: ", x)
+
+# Συνάρτηση εισαγωγής διάρκειας δραστηριότητας
+def duration():
+    # Εισαγωγή διάρκειας με έλεγχο ορθότητας (Δεν μπορεί να υπερβαίνει τον συνολικό ελεύθερο χρόνο, τις 168 ώρες της εβδομάδας και να είναι αρνητική ή χαρακτήρας).
+    while True:
+        try:
+            diarkeia = input ("Δώστε την διάρκεια της δραστηριότητας σε ώρες: ").strip()
+            diarkeia = float(diarkeia)
+            if diarkeia and 0 < diarkeia <= total_hours and diarkeia + total_hours <= weekly_hours:
+                total_hours -= diarkeia
+                if total_hours == 0: # Αν μηδενιστούν οι ελεύθερες ώρες τότε το terminate γινεταί True και δεν αφήνει να μπούμε εκ νέου στην λειτουργία προσθήκης δραστηριότητας
+                    terminate = True 
+                break
+            else:
+                print(f"Η διάρκεια πρέπει να είναι θετικός αριθμός και δεν μπορεί να ξεπερνάει τις {total_hours} διαθέσιμες ώρες ή τις 168 ώρες της εβδομάδας.")
+        except ValueError:
+            print("Μή έγκυρη είσοδος, παρακαλώ εισάγετε έναν αριθμό ωρών.")
+
+# Συνάρτηση εισαγωγής βαθμού σημαντικότητας
+def importance():
+    while True:
+        try:    
+            grade = input("Δώστε τον βαθμό σημαντικότητας (1-10): ").strip()
+            grade = int(grade)
+            if grade and 1 <= grade <= 10:
+                return grade
+            else:
+                print("Παρακαλώ δώστε έναν βαθμό απο το 1 εώς το 10.")
+        except ValueError:
+            print("Μή έγκυρη τιμή.")
+
+# Προσθήκη δραστηριότητας
+def add_activity(total_hours , activities):
+    """ Εισάγει νέα δραστηριότητα ελέγχοντας πρώτα αν δεν έχει μηδενιστεί ο ελεύθερος χρόνος (μέσω της terminate).
+        Καλεί τις συναρτήσεις εισαγωγής για: όνομα, διάρκεια, ελεύθερου χρόνου(αν δεν έχει γίνει εισαγωγή ελεύθερου χρόνου πιο πριν) και βαθμού σημαντικότητας.
+        Στην συνέχεια δημιουργεί dictionary για κάθε δραστηριότητα και το αποθηκεύει στην λίστα activities.
+    """
+    global terminate
+    if terminate == False: # Αν έχω διαθέσιμο ελεύθερο χρόνο μπουώ να εισάγω νέα δραστηριότητα
+        while True:
+            
+        # Eπιλογή τύπου δραστηριότητας, 1 για Υποχρέωση ή 2 για Χόμπι.
             while True:
                 try:
-                    total_hours = input("Παρακαλώ εισάγετε τις συνολικές ώρες που έχετε διαθέσιμες για αυτήν την εβδομάδα: ").strip()
-                    total_hours = float(total_hours)
-                    if total_hours and 0 <= total_hours <= 168:
+                    choice = int(input(("Πληκτρολογείστε 1 για Υποχρέωση ή 2 για Χόμπι: ")))
+                    if choice in [1,2]:
+                        break
+                    print("Η επιλογή δεν υπάρχει. Παρακαλώ προσπαθήστε ξανά.")
+                except ValueError:
+                    print("Μη έγκυρη είσοδος.")
+            
+                
+
+            onoma = name()
+            if any(activity["Δραστηριότητα"] == onoma for activity in activities):
+                print("\nΗ δραστηριότητα υπάρχει ήδη.")
+                break
+        
+        #Εισαγωγή διάρκειας δραστηριότητας
+
+            # αν οι συνολικές διαθέσιμες ώρες είναι 0 , εισαγωγή των ωρών πρώτα
+            if total_hours == 0:
+                total_hours = eleutheros_xronos()
+           
+            """
+            # Εισαγωγή διάρκειας με έλεγχο ορθότητας (Δεν μπορεί να υπερβαίνει τον συνολικό ελεύθερο χρόνο, τις 168 ώρες της εβδομάδας και να είναι αρνητική ή χαρακτήρας).
+            while True:
+                try:
+                    diarkeia = input ("Δώστε την διάρκεια της δραστηριότητας σε ώρες: ").strip()
+                    diarkeia = float(diarkeia)
+                    if diarkeia and 0 < diarkeia <= total_hours and diarkeia + total_hours <= weekly_hours:
+                        total_hours -= diarkeia
+                        if total_hours == 0: # Αν μηδενιστούν οι ελεύθερες ώρες τότε το terminate γινεταί True και δεν αφήνει να μπούμε εκ νέου στην λειτουργία προσθήκης δραστηριότητας
+                            terminate = True 
                         break
                     else:
-                        print("Οι συνολικές διαθέσιμές ώρες δεν μπορούν να είναι αρνητικός αριθμός ή περισσότερες από τις 168 ώρες της εβδομάδας.")
+                        print(f"Η διάρκεια πρέπει να είναι θετικός αριθμός και δεν μπορεί να ξεπερνάει τις {total_hours} διαθέσιμες ώρες ή τις 168 ώρες της εβδομάδας.")
                 except ValueError:
-                    print ("Μή έγκυρη είσοδος. Παρακαλώ εισάγετε τον αριθμό των διαθέσιμων ωρών.")
+                    print("Μή έγκυρη είσοδος, παρακαλώ εισάγετε έναν αριθμό ωρών.")
+            """
 
-        # Εισαγωγή διάρκειας με έλεγχο ορθότητας (Δεν μπορεί να υπερβαίνει τον συνολικό ελεύθερο χρόνο, τις 168 ώρες της εβδομάδας και να είναι αρνητική ή χαρακτήρας).
-        while True:
-            try:
-                diarkeia = input ("Δώστε την διάρκεια της δραστηριότητας σε ώρες: ").strip()
-                diarkeia = float(diarkeia)
-                if diarkeia and 0 < diarkeia <= total_hours and diarkeia + total_hours <= weekly_hours:
-                    total_hours -= diarkeia
-                    break
-                else:
-                    print(f"Η διάρκεια πρέπει να είναι θετικός αριθμός και δεν μπορεί να ξεπερνάει τις {total_hours} διαθέσιμες ώρες ή τις 168 ώρες της εβδομάδας.")
-            except ValueError:
-                print("Μή έγκυρη είσοδος, παρακαλώ εισάγετε έναν αριθμό ωρών.")
+        # Eισαγωγή σημαντικότητας
+            grade = importance()
+            
+        # Εισαγωγή του στοιχείου στην λίστα με τα dictionaries
+            # Αποθήκευση ως dictionary με όνομα activity
+            activity = {
+                "Δραστηριότητα" : onoma,
+                "Διάρκεια" : diarkeia,
+                "Σημαντικότητα" : grade
+            }
 
-    # Eισαγωγή σημαντικότητας
-        while True:
-            try:    
-                grade = input("Δώστε τον βαθμό σημαντικότητας (1-10): ").strip()
-                grade = int(grade)
-                if grade and 1 <= grade <= 10:
-                    break
-                else:
-                    print("Παρακαλώ δώστε έναν βαθμό απο το 1 εώς το 10.")
-            except ValueError:
-                print("Μή έγκυρη τιμή.")
-        
-    # Εισαγωγή του στοιχείου στην λίστα με τα dictionaries
-        # Αποθήκευση ως dictionary με όνομα activity
-        activity = {
-            "Δραστηριότητα" : onoma,
-            "Διάρκεια" : diarkeia,
-            "Σημαντικότητα" : grade
-        }
-
-        # Προσθήκη του dictionary στην λίστα 
-        activities.append(activity)
-        
-        return total_hours         
+            # Προσθήκη του dictionary στην λίστα 
+            activities.append(activity)
+            
+            return total_hours
+    else:
+        print("\nΔεν έχετε διαθέσιμό ελεύθερο χρόνο, παρακαλώ τροποποιήστε ή διαγράψτε κάποια δραστηριότητα εάν επιθυμείτε να προσθέσετε μια νέα ή επιλέξτε να προσθέτε περισσότερο ελεύθερο χρόνο")   
 
 # Εμφάνιση όλων των αποθηκευμένων δραστηριοτήτων
 def display_activities(activities):
@@ -189,16 +250,20 @@ def modify(activities):
             print("3. Τροποποίηση βαθμού σημαντικότητας δραστηριότητας")
             print("4. Ακύρωση\n")
             
-            # Έλεγχος εγκυρότητας επιλογής
-            while True:
-                dynatotita = epilogi()
-                if 1 <= dynatotita <=4:
+            
+            dynatotita = epilogi(x=4)
+            
+            if dynatotita == 1:
+                onoma = name()
+                if any(activity["Δραστηριότητα"] == onoma for activity in activities):
+                    print("\nΗ δραστηριότητα υπάρχει ήδη.")
                     break
                 else:
-                    print("Παρακαλώ επιλέξτε μια απο τις διαθέσιμες ενέργειες.")
-            
-
-
+                    activity["Δραστηριότητα"] = onoma
+                    print("Το όνομα της δραστηριότητας άλλαξε σε: ", activity["Δραστηριότητα"])
+                    return
+            elif dynatotita == 2:
+                pass
 
             break    
         # Αν η επιλογή δεν είναι έγκυρη      
@@ -223,16 +288,18 @@ def modify(activities):
 
 # Κυρίως πρόγραμμα
 def main():
-    global total_hours
-
+    global total_hours, terminate
+    terminate = False
     while True:
 
         display_menu()
-        leitourgia = epilogi()
+        leitourgia = epilogi(x=5)
         if leitourgia == 1:
             total_hours = add_activity(total_hours , activities)
+            
         elif leitourgia == 2:
             display_activities(activities)
+            
         elif leitourgia == 3:
             modify(activities)
         elif leitourgia == 4:
