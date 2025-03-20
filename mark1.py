@@ -47,8 +47,12 @@ TODO: Συναρτήσεις για εισαγωγές , Επιπλέον επι
     4) Εισαγωγή βαθμού σημαντικότητας importance()
     5) Εισαγωγή διάρκειας duration(), ταυτόχρονα επαναπροσδιορίζει τον ελεύθερο χρόνο.
 - Αφαίρεση επιλογής για υποχρέωση ή χόμπι (έγιναν σχόλια σε περίπτωση που τα χρησιμοποιήσουμε τελικά)
+- Προσθήκη επιλογής απο το κεντρικό μενου για:
+    1) Προβολή διαθέσιμου χρονου
+    2) Απευθείας εισαγωγή ελεύθερου χρόνου χωρίς να χρειάζεται εισαγωγή ολόκληρης δραστηριότητας
 
-TODO: Συνάρτηση modify
+
+TODO: Συνάρτηση modify | 
 
 
 
@@ -67,14 +71,16 @@ activities = []
 
 
 
-# Μενού:
+# Μενού
 def display_menu():
     print("\n","-" * 10 , "Time Management" , "-" * 10 , "\n")
     print("1. Εισαγωγή νέας δραστηριότητας")
     print("2. Εμφάνιση όλων των δραστηριοτήτων")
     print("3. Τροποποίηση δραστηριοτήτων")
     print("4. Διαγραφη δραστηριότητας")
-    print("5. Έξοδος")
+    print("5. Εμφάνιση διαθέσιμου ελεύθερου χρόνου")
+    print("6. Προσθήκη διαθέσιμου ελεύθερου χρόνου")
+    print("7. Έξοδος")
 
 # Eπιλογή λειτουργίας
 def epilogi(x):
@@ -122,7 +128,10 @@ def eleutheros_xronos():
 # Εμφάνιση του συνολικού ελεύθερου χρόνου
 def display_FreeTime(x):
     """Προβάλει τον διαθέσιμο ελεύθερο χρόνο"""
-    print("Ο συνολικός ελεύθερος χρόνος για αυτή την εβδομάδα είναι: ", x)
+    if x > 0:
+        print("\nΟ συνολικός ελεύθερος χρόνος σας για αυτή την εβδομάδα είναι: ", x, "ώρες.")
+    else:
+        print("\nΔεν έχετε διαθέσιμό ελεύθερο χρόνο, παρακαλώ τροποποιήστε ή διαγράψτε κάποια δραστηριότητα για να ελευθερώσετε χρόνο ή πατήστε 6 για να προσθέσετε ελεύθερο χρόνο")
 
 # Συνάρτηση εισαγωγής διάρκειας δραστηριότητας
 def duration(total_hours):
@@ -132,13 +141,9 @@ def duration(total_hours):
         try:
             diarkeia = input ("Δώστε την διάρκεια της δραστηριότητας σε ώρες: ").strip()
             diarkeia = float(diarkeia)
-            #print(diarkeia, total_hours)
             if diarkeia and 0 < diarkeia <= total_hours and diarkeia + total_hours <= weekly_hours:
                 total_hours -= diarkeia
-                #print(total_hours)
                 return diarkeia, total_hours
-                
-                
             else:
                 print(f"Η διάρκεια πρέπει να είναι θετικός αριθμός και δεν μπορεί να ξεπερνάει τις {total_hours} διαθέσιμες ώρες ή τις 168 ώρες της εβδομάδας.")
         except ValueError:
@@ -159,6 +164,7 @@ def importance():
 
 # Προσθήκη δραστηριότητας
 def add_activity(total_hours , activities):
+    
     """ Εισάγει νέα δραστηριότητα ελέγχοντας πρώτα αν δεν έχει μηδενιστεί ο ελεύθερος χρόνος (μέσω της terminate).
         Καλεί τις συναρτήσεις εισαγωγής: 
         name() για: όνομα, 
@@ -167,8 +173,12 @@ def add_activity(total_hours , activities):
         importance() για: βαθμό σημαντικότητας.
         Στην συνέχεια δημιουργεί dictionary για κάθε δραστηριότητα και το αποθηκεύει στην λίστα activities.
     """
+    
     global terminate
-    if terminate == False: # Αν έχω διαθέσιμο ελεύθερο χρόνο μπουώ να εισάγω νέα δραστηριότητα
+    if total_hours > 0:
+        terminate=False
+        
+    if terminate == False: # Αν έχω διαθέσιμο ελεύθερο χρόνο μπορώ να εισάγω νέα δραστηριότητα
         while True:
         
         # Eπιλογή τύπου δραστηριότητας, 1 για Υποχρέωση ή 2 για Χόμπι.
@@ -196,9 +206,8 @@ def add_activity(total_hours , activities):
             if total_hours == 0:
                 total_hours = eleutheros_xronos()
            
-            
-            diarkeia, total_hours = duration(total_hours)
-            print("test diarkeia= ", diarkeia, "total_hours = ", total_hours)
+            #Εισαγωγή διάρκειας δραστηριότητας
+            diarkeia, total_hours = duration(total_hours) # Δέχεται το total_hours για τον εκ νέου υπολογισμό του και το στέλνει πίσω μαζί με την diarkeia με το return 
             
         # Eισαγωγή σημαντικότητας
             grade = importance()
@@ -221,9 +230,13 @@ def add_activity(total_hours , activities):
             # Προσθήκη του dictionary στην λίστα 
             activities.append(activity)
             
-            return total_hours
+            return total_hours 
     else:
-        print("\nΔεν έχετε διαθέσιμό ελεύθερο χρόνο, παρακαλώ τροποποιήστε ή διαγράψτε κάποια δραστηριότητα εάν επιθυμείτε να προσθέσετε μια νέα ή επιλέξτε να προσθέτε περισσότερο ελεύθερο χρόνο")   
+        print("\nΔεν έχετε διαθέσιμό ελεύθερο χρόνο, παρακαλώ τροποποιήστε ή διαγράψτε κάποια δραστηριότητα ή επιλέξτε να προσθέσετε ελεύθερο χρόνο")   
+        return total_hours #ΚΑΙ ΓΑΜΩ ΤΑ BUG!!!!!!!!!!!!!!!!!!!!! 
+    
+    """Αν μπεί με 0 για πρώτη φορά τότε τρέχει κανονικά την loop αφου το terminate εχει αρχικοποιηθεί σε False. Όμως το terminate γίνεται True.
+        Αν μπεί για 2η συνεχόμενη φορά με 0 μέσω της επιλογής 1 απο το μενού τότε δεν επέστρεφε καμιά τιμή"""
 
 # Εμφάνιση όλων των αποθηκευμένων δραστηριοτήτων
 def display_activities(activities):
@@ -305,17 +318,22 @@ def main():
     while True:
 
         display_menu()
-        leitourgia = epilogi(x=5)
+        leitourgia = epilogi(x=7)
         if leitourgia == 1:
             total_hours = add_activity(total_hours , activities)
-            
         elif leitourgia == 2:
-            display_activities(activities)
-            
+            display_activities(activities)    
         elif leitourgia == 3:
             modify(activities)
         elif leitourgia == 4:
             pass
+        elif leitourgia == 5:
+            if activities:
+                display_FreeTime(total_hours)
+            else:
+                print("\nΔεν έχετε εισάγει τον διαθέσιμο ελεύθερο χρόνο σας. Παρακαλώ πατήστε το 6 για προσθήκη ελεύθερου χρόνου.")
+        elif leitourgia == 6:
+            total_hours = eleutheros_xronos()
         else:
             print("\nΈξοδος απο το πρόγραμμα.\n")
             break
