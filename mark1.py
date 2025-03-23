@@ -99,21 +99,26 @@ TODO: Συναρτήσεις για εισαγωγές , Επιπλέον επι
 -ΔΙΟΡΘΩΘΗΚΑΝ:
     1)  BUG Κατά την εισαγωγή νέας δραστηριότητας με όνομα ίδιο με κάποια υπάρχουσα, τερμάτιζε η συνάρτηση add και επέστρεφε NONE οπότε στην main() 1 είχα TypeError.
         Πλέον χρησιμοποιώ while true ζητώντας απο τον χρήστη να επανεισάγει το όνομα της νέας συνάρτησης σε περίπτωση που εισάγει ξανά κάποιο υπάρχον.
+-ΤΡΟΠΟΠΟΙΗΘΗΚΑΝ:
+    1)  Αν ο χρήστης επιλέξει να προσθέσει περισσότερο νέο χρόνο τότε απο τον νέο χρόνο που πρόσθεσε αφαιρούνται οι ώρες που απαιτούνται για τις ήδη υπάρχουσες δραστηριότητες.
+-ΠΡΟΣΤΕΘΗΚΕ:
+    1)  delete_activity()
 
 
 
-
-TODO:   Tί συμβαίνει στις λίστες ypoxrewseis & hobby όταν με την modify αλλάζω τα δεδομένα;
+TODO:   Συνάρτηση διαγραφής
 
 
 
 """
 
 # Αρχικοποιήσεις
-weekly_hours = 168
-total_hours = 0 
-total_ypoxrewseis = 0
-total_hobby = 0
+weekly_hours = 168 # H εβδομάδα έχει 168 ώρες -> Αν αλλάξει ποτέ εμείς μάλλον δεν θα είμαστε εδώ!
+total_hours = 0  # Συνολικές ελεύθερες ώρες
+total_ypoxrewseis = 0 # Συνολικός χρόνος που απαιτείται για υποχρεώσεις
+total_hobby = 0 # Συνολικός χρόνος που απαιτείται για χόμπι
+total_activities = 0 # Συνολικός χρόνος που απαιτείται για όλες τις δραστηριότητες
+
 # Λίστες απο dictionaries για κάθε τύπο δραστηριότητας.
 activities = []
 ypoxrewseis = []
@@ -165,42 +170,60 @@ def name():
     return onoma
 
 # Εισαγωγή συνολικού ελεύθερου χρόνου
-def eleutheros_xronos():
-    """Εισάγει τον ελεύθερο χρόνο"""
+def eleutheros_xronos(total_activities):
+    """ 
+        Εισάγει τον ελεύθερο χρόνο. Αν ο χρήστης επιλέξει να προσθέσει περισσότερο νέο χρόνο τότε:
+        απο τον νέο χρόνο που πρόσθεσε αφαιρούνται οι ώρες που απαιτούνται για τις ήδη υπάρχουσες δραστηριότητες.
+    """
     while True:
         try:
             total_hours = input("Παρακαλώ εισάγετε τις συνολικές ώρες που έχετε διαθέσιμες για αυτήν την εβδομάδα: ").strip()
             total_hours = float(total_hours)
-            if total_hours and 0 <= total_hours <= 168:
+            
+            if total_hours and 0 <= total_hours <= 168 and total_hours >= total_activities:
+                total_hours -= total_activities
+                if activities:
+                    print(f"\nΑφαιρέθηκαν {total_activities} ώρες από τον νέο συνολικό σας χροόνο για τις ήδη υπάρχουσες δραστηριότητές σας.")
+                    print(f"\nΟ νέος συνολικός ελεύθερος χρόνος σας είναι: {total_hours}.")
                 return total_hours
             else:
-                print("Οι συνολικές διαθέσιμές ώρες δεν μπορούν να είναι αρνητικός αριθμός ή περισσότερες από τις 168 ώρες της εβδομάδας.")
+                if total_activities > total_hours:
+                    print(f"\nΕισάγετε παραπάνω ώρες! Απαιτούνται {total_activities} ώρες για τις ήδη υπάρχουσες δραστηριότητές σας.")
+                else:
+                    print("Οι συνολικές διαθέσιμές ώρες δεν μπορούν να είναι αρνητικός αριθμός ή περισσότερες από τις 168 ώρες της εβδομάδας.")
+                
         except ValueError:
             print ("Μή έγκυρη είσοδος. Παρακαλώ εισάγετε τον αριθμό των διαθέσιμων ωρών.")
 
 # Εμφάνιση του συνολικού ελεύθερου χρόνου
-def display_FreeTime(x):
+def display_FreeTime(x,activities):
     """Προβάλει τον διαθέσιμο ελεύθερο χρόνο"""
+    
     if x > 0:
         print("\nΟ συνολικός ελεύθερος χρόνος σας για αυτή την εβδομάδα είναι: ", x, "ώρες.")
     else:
-        print("\nΔεν έχετε διαθέσιμό ελεύθερο χρόνο, παρακαλώ τροποποιήστε ή διαγράψτε κάποια δραστηριότητα για να ελευθερώσετε χρόνο ή πατήστε 6 για να προσθέσετε ελεύθερο χρόνο")
-
+        if not activities:
+            print("\nΔεν έχετε εισάγει τον διαθέσιμο ελεύθερο χρόνο σας. Παρακαλώ πατήστε το 6 για προσθήκη ελεύθερου χρόνου.")
+        else:
+            print("\nΔεν έχετε διαθέσιμό ελεύθερο χρόνο, παρακαλώ τροποποιήστε ή διαγράψτε κάποια δραστηριότητα για να ελευθερώσετε χρόνο ή πατήστε 6 για να προσθέσετε ελεύθερο χρόνο")
+            
 # Συνάρτηση εισαγωγής διάρκειας δραστηριότητας
 def duration(total_hours):
     
     # Εισαγωγή διάρκειας με έλεγχο ορθότητας (Δεν μπορεί να υπερβαίνει τον συνολικό ελεύθερο χρόνο, τις 168 ώρες της εβδομάδας και να είναι αρνητική ή χαρακτήρας).
     while True:
         try:
-            diarkeia = input ("Δώστε την διάρκεια της δραστηριότητας σε ώρες: ").strip()
+            diarkeia = input ("\nΔώστε την διάρκεια της δραστηριότητας σε ώρες: ").strip()
             diarkeia = float(diarkeia)
-            if diarkeia and 0 < diarkeia <= total_hours and diarkeia + total_hours <= weekly_hours:
+            if diarkeia and 0 < diarkeia <= total_hours:
                 total_hours -= diarkeia
                 return diarkeia, total_hours
             else:
-                print(f"Η διάρκεια πρέπει να είναι θετικός αριθμός και δεν μπορεί να ξεπερνάει τις {total_hours} διαθέσιμες ώρες ή τις 168 ώρες της εβδομάδας.")
+                if diarkeia + total_hours > weekly_hours:
+                    print(f"")
+                print(f"\nΗ διάρκεια πρέπει να είναι θετικός αριθμός και δεν μπορεί να ξεπερνάει τις {total_hours} διαθέσιμες ώρες ή τις 168 ώρες της εβδομάδας.")
         except ValueError:
-            print("Μή έγκυρη είσοδος, παρακαλώ εισάγετε έναν αριθμό ωρών.")
+            print("\nΜή έγκυρη είσοδος, παρακαλώ εισάγετε έναν αριθμό ωρών.")
 
 # Συνάρτηση εισαγωγής βαθμού σημαντικότητας
 def importance():
@@ -227,10 +250,11 @@ def add_activity(total_hours , activities):
         Στην συνέχεια δημιουργεί dictionary για κάθε δραστηριότητα και το αποθηκεύει στην λίστα activities.
     """
     
-    global terminate, total_ypoxrewseis, total_hobby
-    if total_hours > 0:
+    global terminate, total_ypoxrewseis, total_hobby, total_activities
+    
+    if total_hours > 0 and activities:
         terminate=False
-        
+    print(terminate)
     if terminate == False: # Αν έχω διαθέσιμο ελεύθερο χρόνο μπορώ να εισάγω νέα δραστηριότητα
         while True:
         
@@ -264,11 +288,12 @@ def add_activity(total_hours , activities):
 
             # αν οι συνολικές διαθέσιμες ώρες είναι 0 , εισαγωγή των ωρών πρώτα
             if total_hours == 0:
-                total_hours = eleutheros_xronos()
+                total_hours = eleutheros_xronos(total_activities)
            
             #Εισαγωγή διάρκειας δραστηριότητας
             diarkeia, total_hours = duration(total_hours) # Δέχεται το total_hours για τον εκ νέου υπολογισμό του και το στέλνει πίσω μαζί με την diarkeia με το return 
-            
+            total_activities += diarkeia # Υπολογισμός του συνολικού χρόνου που απαιτείται για όλες τις δραστηριότητες.
+        
         # Eισαγωγή σημαντικότητας
             grade = importance()
         
@@ -288,19 +313,22 @@ def add_activity(total_hours , activities):
                 "Τύπος" : type
             }
             
+            # Αν η επιλογή είναι 1 τότε προσθέτω την δραστηριότητα και στην λίστα με τις υποχρεώσεις.
             if choice == 1:
                 ypoxrewseis.append(activity)
-                total_ypoxrewseis += diarkeia
-            else:
+                total_ypoxrewseis += diarkeia # Υπολογισμός του συνολικού χρόνου που απαιτείται για τις υποχρεώσεις.
+            else: # Αν η επιλογή είναι 2 τότε προσθέτω την δραστηριότητα και στην λίστα με τα χόμπι.
                 hobby.append(activity)
-                total_hobby += diarkeia
+                total_hobby += diarkeia # Υπολογισμός του συνολικού χρόνου που απαιτείται για τα χόμπι.
+            
+            
             # Προσθήκη του dictionary στην λίστα 
             activities.append(activity)
             
-            return total_hours,  total_hobby, total_ypoxrewseis
+            return total_hours, total_hobby, total_ypoxrewseis, total_activities
     else:
         print("\nΔεν έχετε διαθέσιμό ελεύθερο χρόνο, παρακαλώ τροποποιήστε ή διαγράψτε κάποια δραστηριότητα ή επιλέξτε να προσθέσετε ελεύθερο χρόνο")   
-        return total_hours #ΚΑΙ ΓΑΜΩ ΤΑ BUG!!!!!!!!!!!!!!!!!!!!! 
+        return total_hours , total_hobby, total_ypoxrewseis, total_activities #ΚΑΙ ΓΑΜΩ ΤΑ BUG!!!!!!!!!!!!!!!!!!!!! 
     
     """Άν μπεί με 0 για πρώτη φορά τότε τρέχει κανονικά την loop αφου το terminate εχει αρχικοποιηθεί σε False. Όμως το terminate γίνεται True.
         Αν μπεί για 2η συνεχόμενη φορά με 0 μέσω της επιλογής 1 απο το μενού τότε δεν επέστρεφε καμιά τιμή"""
@@ -316,7 +344,7 @@ def display_activities(activities):
             print (f"{drastiriotita['Δραστηριότητα']} : Διάρκεια: {drastiriotita['Διάρκεια']} ώρες | Βαθμός σημαντικότητας: {drastiriotita['Σημαντικότητα']} | Τύπος: {drastiriotita['Τύπος']}")
 
 # Εμφάνιση όλων των αποθηκευμένων υποχρεώσεων
-def display_ypoxrewseis(ypoxrewseis):
+def display_ypoxrewseis(ypoxrewseis, total_ypoxrewseis):
     """Προβάλει τις αποθηκευμένες υποχρεώσεις ή αν δεν υπάρχουν, ενημερώνει με κατάλληλο μήνυμα."""
     if not ypoxrewseis:
         print("\nΔεν βρέθηκαν υποχρεώσεις.\n")
@@ -324,19 +352,21 @@ def display_ypoxrewseis(ypoxrewseis):
         print("\nΟι υποχρεώσεις σας αυτή την εβδομάδα είναι: \n")
         for drastiriotita in ypoxrewseis:
             print (f"{drastiriotita['Δραστηριότητα']} : Διάρκεια: {drastiriotita['Διάρκεια']} ώρες | Βαθμός σημαντικότητας: {drastiriotita['Σημαντικότητα']}")
+        print("\nO συνολικός χρόνος που απαιτείται για υποχρεώσεις αυτή  την εβδομάδα είναι: ", total_ypoxrewseis," ώρες")
 
 # Εμφάνιση όλων των αποθηκευμένων χόμπι
-def display_hobby(hobby):
+def display_hobby(hobby, total_hobby):
     """Προβάλει τις αποθηκευμένες δραστηριότητες ελεέυθερου χρόνου ή αν δεν υπάρχουν, ενημερώνει με κατάλληλο μήνυμα."""
-    if not ypoxrewseis:
+    if not hobby:
         print("\nΔεν βρέθηκαν δραστηριότητες ελεύθερου χρόνου (χόμπι).\n")
     else:
         print("\nΤα χόμπι σας αυτή την εβδομάδα είναι: \n")
         for drastiriotita in hobby:
             print (f"{drastiriotita['Δραστηριότητα']} : Διάρκεια: {drastiriotita['Διάρκεια']} ώρες | Βαθμός σημαντικότητας: {drastiriotita['Σημαντικότητα']}")
+        print("\nO συνολικός χρόνος που απαιτείται για χόμπι αυτή  την εβδομάδα είναι: ", total_hobby," ώρες")
 
 # Τροποποίηση
-def modify(activities):
+def modify(activities, total_hobby, total_ypoxrewseis):
     """
         Αν δεν έχουν καταχωρηθεί δραστηριότητες η συνάρτηση εμφανίζει κατάλληλο μήνυμα και τερματίζει. Αν υπάρχουν δραστηριότητες τοτε τις εμφανίζει
         και καλεί ένα μενού επιλογών τροποποίησης. Ο χρήστης επιλέγει μια δυνατότητα με βάση το μενού. Κάθε φορά που πραγματοποιείται μια αλλαγή 
@@ -376,34 +406,63 @@ def modify(activities):
                 
                 if dynatotita == 1:
                     onoma = name()
-                    print("TEST to neo onoma pou thelw einai ", onoma)
                     if any(activity["Δραστηριότητα"] == onoma for activity in activities):
                         print("\nΗ δραστηριότητα υπάρχει ήδη.")
                         return
                     else:
-                        print("TEST sthn else ", activity["Δραστηριότητα"])
+                        # Aν η δραστηριότητα που θέλω να αλλάξω είναι Υποχρέωση τότε αλλάζω το όνομα της και στην λίστα ypoxrewseis()
+                        if activity["Τύπος"] == "Υποχρέωση":
+                            for ypoxrewsi in ypoxrewseis:
+                                if activity["Δραστηριότητα"] == ypoxrewsi["Δραστηριότητα"]:
+                                    ypoxrewsi["Δραστηριότητα"] = onoma
+                        else: # Aν η δραστηριότητα που θέλω να αλλάξω είναι χόμπι τότε αλλάζω το όνομα της και στην λίστα hobby()
+                            for xompi in hobby:
+                                if activity["Δραστηριότητα"] == xompi["Δραστηριότητα"]:
+                                    xompi["Δραστηριότητα"] = onoma
+
+
                         activity["Δραστηριότητα"] = onoma
                         print("\nΤο όνομα της δραστηριότητας άλλαξε σε: ", activity["Δραστηριότητα"])
+                        
                         return
                 elif dynatotita == 2:
                     # Αλλάζει το total_hours προσθέτωντας πίσω την προηγούμενη διάρκεια
                     total_hours += activity["Διάρκεια"] 
-                    
+                    print("\nΟι διαθέσιμες ώρες σας είναι: " , total_hours, "ώρες.")
                     # Κλήση της duration για εισαγωγή νέας διάρκειας και υπολογισμό του total_hours εκ νέου
                     diarkeia, total_hours = duration(total_hours)
 
+                    # Aν η δραστηριότητα που θέλω να αλλάξω είναι Υποχρέωση τότε αλλάζω την Διάρκεια της και στην λίστα ypoxrewseis()
+                    if activity["Τύπος"] == "Υποχρέωση":
+                        for ypoxrewsi in ypoxrewseis:
+                            if activity["Δραστηριότητα"] == ypoxrewsi["Δραστηριότητα"]:
+                                
+                                total_ypoxrewseis -= ypoxrewsi["Διάρκεια"]
+                                
+                                ypoxrewsi["Διάρκεια"] = diarkeia
+                                
+                                total_ypoxrewseis += ypoxrewsi["Διάρκεια"]
+                                
+                    
+                    else: # Aν η δραστηριότητα που θέλω να αλλάξω είναι χόμπι τότε αλλάζω την Διάρκεια της και στην λίστα hobby()
+                        for xompi in hobby:
+                            if activity["Δραστηριότητα"] == xompi["Δραστηριότητα"]:
+                                total_hobby -= xompi["Διάρκεια"]
+                                xompi["Διάρκεια"] = diarkeia
+                                total_hobby += xompi["Διάρκεια"]
+                    
                     # Καταχώρηση αλλαγής διάρκειας στο dict
                     activity["Διάρκεια"] = diarkeia
                     print("\nH διάρκεια της δραστηριότητας άλλαξε σε: ", activity['Διάρκεια'])
-                    print("Ο νέος διαθέσιμος χρόνος είναι: ", total_hours)
-                    return
+                    print("\nΟ νέος διαθέσιμος χρόνος είναι: ", total_hours)
+                    return total_hours, total_hobby, total_ypoxrewseis
                 elif dynatotita == 3:
                     activity["Σημαντικότητα"] = importance()
                     print(f"\nΟ βαθμός σημαντικότητας της δραστηριότητας {activity["Δραστηριότητα"]} άλλαξε σε {activity["Σημαντικότητα"]}")
-                    return
+                    return total_hours, total_hobby, total_ypoxrewseis
                 else:
                     print ("\nΈξοδος απο το μενού τροποποίσης.")
-                    return
+                    return total_hours, total_hobby, total_ypoxrewseis
                     
             # Αν η επιλογή δεν είναι έγκυρη      
             else:
@@ -416,47 +475,113 @@ def taksinomisi (x):
     activities.sort(key = lambda x: x["Σημαντικότητα"], reverse=True)
     return activities
             
+# Διαγραφή
+def delete_activity(activities, total_ypoxrewseis, total_hobby, total_hours, total_activities, ypoxrewseis, hobby ):
+    """
+        Εμφάνιση όλων των δραστηριοτήτων μέσω της display_activities. Ο χρήστης επιλέγει κάποια, αν επιλέξει κάποια που δεν υπάρχει τότε εμφανίζεται κατάλληλο μήνυμα.
+        Αν επιλέξει κάποια που υπάρχει τότε βρίσκει αν ειναι υποχρέωση ή χόμπι. Διαγράφει την δραστηριότητα απο την λίστα υποχρεώσεων ή χόμπι. Διαγράφει την δραστηριότητα
+        απο την λιστα όλων των δραστηριοτήτων. Ο χρόνος της δραστηριότητας αφαιρείται απο τον συνολικό χρόνο δραστηριοτήτων και τον συνολικό χρόνο υποχρ. ή χόμπι και στο
+        total_hours που είναι ο συνολικός διαθέσιμος ελεύθερος χρόνος, προστίθεται η διάρκεια της δραστηριότητας που διαγράφθηκε.
+    """
+    # Αν δεν έχουν καταχωρηθεί δραστηριότητες: κατάλληλο μήνυμα και επιστροφή στο main()
+    if not activities:
+        print ("\nΔεν υπάρχουν δραστηριότητες για διαγραφή.")
+        return total_ypoxrewseis, total_hobby, total_hours, total_activities
+    
+    # Εμφάνιση και επιλογή διαθέσιμων δραστηριοτήτων
+    print ("\nΕπιλέξτε μία απο τις διαθέσιμες δραστηριότητες για διαγραφή: \n")
+    for activity in activities:
+        print (f"{activity['Δραστηριότητα']}")
+
+    
+    while True:
+        # Επιλογή του χρήστη 
+        choice = input().strip()
+
+          
+        for activity in activities:
+            
+            # Αν η επιλογή του χρήστη υπάρχει τότε μπορεί να την διαγράψει, αλλίως ενημέρωση ότι η εισαγωγή του δεν υπάρχει
+            if activity["Δραστηριότητα"] == choice:
+                
+                # Αν δόθηκε υπάρχουσα δραστηριότητα τότε κρατάω την διάρκειά της
+
+                # Aν η δραστηριότητα που θέλω να διαγράψω είναι Υποχρέωση τότε την διαγράφω και από λίστα ypoxrewseis()
+                if activity["Τύπος"] == "Υποχρέωση":
+                    total_ypoxrewseis -= activity["Διάρκεια"]
+                    for act in ypoxrewseis:
+                        if act["Δραστηριότητα"] == choice:
+                            ypoxrewseis.remove(act)
+                    
+                
+                else: # Aν η δραστηριότητα που θέλω να διαγράψω είναι χόμπι τότε την διαγράφω και από λίστα hobby()
+                    total_hobby -= activity["Διάρκεια"]
+                    for act in hobby:
+                        if act["Δραστηριότητα"] == choice:
+                            hobby.remove(act)
+                
+                # Διαγραφή απο την λίστα όλων των δραστηριοτήτων
+                total_hours += activity["Διάρκεια"]
+                total_activities -= activity["Διάρκεια"]
+                activities.remove(activity)
+                print("TEST o synolikos xronos otan bgainw apo tin remove einai ", total_hours)
 
 
 
 
 
+            # Αν η επιλογή δεν είναι έγκυρη      
+            else:
+                print ("\nH δραστηριότητα που επιλέξατε δεν υπάρχει, παρακαλώ επιλέξτε μια από τις παρακάτω: \n")
+                for activity in activities:
+                    print (f"{activity['Δραστηριότητα']}")
 
-
-
+        return total_ypoxrewseis, total_hobby, total_hours, total_activities
     
 
 
 # Κυρίως πρόγραμμα
 def main():
-    global total_hours, terminate
+    global total_hours, terminate, total_hobby, total_ypoxrewseis, total_activities
     terminate = False
     while True:
 
         display_menu()
         leitourgia = epilogi(x=9)
+        
         if leitourgia == 1:
-            total_hours, total_hobby, total_ypoxrewseis = add_activity(total_hours , activities)
+            total_hours, total_hobby, total_ypoxrewseis, total_activities = add_activity(total_hours , activities)
             taksinomisi(activities)
             taksinomisi(ypoxrewseis)
             taksinomisi(hobby)
+        
         elif leitourgia == 2:
             display_activities(activities) 
+        
         elif leitourgia == 3:
-            modify(activities)
+            total_hours, total_hobby, total_ypoxrewseis = modify(activities,total_hobby, total_ypoxrewseis)
+            taksinomisi(activities)
+            taksinomisi(ypoxrewseis)
+            taksinomisi(hobby)
+        
         elif leitourgia == 4:
-            pass
+            total_ypoxrewseis, total_hobby, total_hours, total_activities = delete_activity(activities, total_ypoxrewseis, total_hobby, total_hours, total_activities, ypoxrewseis, hobby)
+            print ("TEST o synolikos xronos otan epistrefw stin main einai ",total_hours)
         elif leitourgia == 5:
-            if activities:
-                display_FreeTime(total_hours)
-            else:
-                print("\nΔεν έχετε εισάγει τον διαθέσιμο ελεύθερο χρόνο σας. Παρακαλώ πατήστε το 6 για προσθήκη ελεύθερου χρόνου.")
+            #if activities:
+                display_FreeTime(total_hours,activities)
+            #else:
+                #print("\nΔεν έχετε εισάγει τον διαθέσιμο ελεύθερο χρόνο σας. Παρακαλώ πατήστε το 6 για προσθήκη ελεύθερου χρόνου.")
+        
         elif leitourgia == 6:
-            total_hours = eleutheros_xronos()
+            total_hours = eleutheros_xronos(total_activities)
+        
         elif leitourgia == 7:
-            display_ypoxrewseis(ypoxrewseis)
+            display_ypoxrewseis(ypoxrewseis,total_ypoxrewseis)
+        
         elif leitourgia == 8:
-            display_hobby(hobby)
+            display_hobby(hobby, total_hobby)
+        
         else:
             print("\nΈξοδος απο το πρόγραμμα.\n")
             break
