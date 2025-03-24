@@ -1,4 +1,9 @@
 lex,test,5.0,5
+<<<<<<< HEAD
 lex,lol,10.0,10
 lex,lel,3.0,3
 test,test,10.0,10
+=======
+lex,lel,5.0,5
+test,test,15.0,5
+>>>>>>> 9a218a8a5b609e3db1360b434d7a1c696f5ce579
