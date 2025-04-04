@@ -1,10 +1,6 @@
 import customtkinter as ctk
 import tkinter.messagebox as messagebox
-from main import (
-    hash_password, manage_free_time, create_new_user, select_user, task_add, task_edit, 
-    task_del, sort_by_importance, show_all, average_time, plot_pie_chart, plot_bar_chart,
-    load_users_from_csv, load_tasks_from_csv, save_users_to_csv, save_tasks_to_csv, users
-)
+from main import *
 current_user = None  # Track the currently logged-in user
 
 

@@ -58,7 +58,6 @@ def create_new_user(username, password):
     save_users_to_csv()  # Αποθήκευση του νέου χρήστη στο αρχείο CSV
     return True, f"Ο χρήστης {username} δημιουργήθηκε επιτυχώς."
     
-
 def select_user():
     """
     Επιτρέπει τη σύνδεση χρήστη μέσω ονόματος και κωδικού πρόσβασης.
