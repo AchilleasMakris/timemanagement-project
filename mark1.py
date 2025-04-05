@@ -128,7 +128,7 @@ TODO:
 
 TODO:
 1) Εισαγωγή matplotlib
-2) Tk inter
+2) Tkinter
 
 
 
