@@ -129,8 +129,35 @@ TODO:
 TODO:
 1) Εισαγωγή matplotlib
 2) Tkinter
+3) Εισαγωγή και διαχείρηση χρηστών.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+06/04/2025:
+-ΟΛΟΚΛΗΡΩΘΗΚΑΝ:
+    1) Συνάρτηση προσθήκης νέου χρήστη με καταχωρημένα username και password για τον καθένα
+    2) Συνάρτηση εγγραφής λίστας χρηστών σε csv
+    3) Συνάρτηση φόρτωσης λίστας χρηστών απο csv
+    4) Συνάρτηση connect_user() για σύνδεση του χρήστη στο πρόγραμμα.
+    5) Συνάρτηση login_menu() για προβολή του μενού login.
+
+-ΤΡΟΠΟΠΟΙΗΘΗΚΑΝ:
+    1)  Στην main() το κυρίως πρόγραμμα τρέχει μόνο όταν συνδεθει κάποιος χρήστης. Αν κατά την σύνδεση ο χρήστης εισάγει λανθασμένα στοιχεία
+        το πρόγραμμα επιμένει σε loop προβολής του μενού login εώς ότου ο χρήστης επιλέξει 3 για έξοδο.
 
 
+TODO: 
+1)  Πρέπει να βάλω και τον ελεύθερο χρόνο που έχει ο χρήστης.
+2)  Στο κεντρικό μενού να δίνεται επιλογή στον συνδεδεμένο χρήστη να διαγράψει το προφίλ του απο το csv.
+3)  Πρέπει να συνδεθούν οι δραστηριότητες από το csv με τους εκάστωτε χρήστες.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+07/04/2025:
+ΠΑΡΑΤΗΡΗΣΕΙΣ BUG:
+1)  Έστω ότι έχω αποθηκευμένες δραστηριότητες κάποιου χρήστη.  Κατά την σύνδεση νέου χρήστη το total_activities τραβάει όλες τις αποθηκευμένες δραστηριότητες ενώ πρέπει να τραβάει μόνο τις δραστηριότητες του χρήστη.
+    Το total_activities υπολογίζει τον χρόνο που απαιτείται για τις δραστηριότητες μόνο του συγκεκριμένου χρήστη. 
+
+TODO:
+1)  Το total_activities πρέπει να υπολογίζει τον χρόνο που απαιτείται για τις δραστηριότητες μόνο του συγκεκριμένου χρήστη.
 
 
 
@@ -142,18 +169,93 @@ import csv
 
 # Αρχικοποιήσεις
 weekly_hours = 168 # H εβδομάδα έχει 168 ώρες -> Αν αλλάξει ποτέ εμείς μάλλον δεν θα είμαστε εδώ!
-total_hours = 0  # Συνολικές ελεύθερες ώρες
+user_total_hours = 0  # Συνολικές ελεύθερες ώρες
 total_ypoxrewseis = 0 # Συνολικός χρόνος που απαιτείται για υποχρεώσεις
 total_hobby = 0 # Συνολικός χρόνος που απαιτείται για χόμπι
 total_activities = 0 # Συνολικός χρόνος που απαιτείται για όλες τις δραστηριότητες
 
 # Λίστες απο dictionaries για κάθε τύπο δραστηριότητας (εφικτές δραστηριότητες)
 activities = []
-ypoxrewseis = []
-hobby = []
+user_activities = []
+user_ypoxrewseis = []
+user_hobby = []
+users =[]
 
+# Προσθήκη νέου χρήστη
+def add_user(users):
+    """
+        Δημιουργεί έναν νέο χρήστη ο οποίος αποθηκεύεται στο λεξικό users καταχωρώντας το username και το password τα οποία ζητούνται απο την συνάρτηση.
+    """
+    username = input("\nΠληκτρολογείστε το όνομα χρήστη: ").strip()
+    if any(user.get("username") == username for user in users):
+        print("\nΤο όνομα χρήστη χρησιμοποιείται ήδη.")
+        return
+    while True:
+        password_test1 = input("\nΠληκτρολογείστε τον κωδικό πρόσβασης: ").strip()
+        password_test2 = input("\nΕπιβεβαιώστε τον κωδικό πρόσβασης: ").strip()
+        if password_test1 == password_test2:
+            password = password_test1
+            print("\nΟ κωδικός καταχωρήθηκε επιτυχώς.")
+            break
+        else:
+            print("Οι κωδικοί δεν είναι ίδιοι. Παρακαλώ πληκτρολογείστε εκ νέου τον κωδικό.")
+    
+    user = {
+        "username" : username,
+        "password" : password,
+        "user_total_hours" : 0
+    }
+    users.append(user)
+    
+    print(f"\nΟ χρήστης {username} δημιουργήθηκε επιτυχώς.")
+    save_user_to_csv()
 
+# Αποθήκευση του χρήστη σε csv
+def save_user_to_csv(arxeio = "users.csv"):
+    """
+        Αποθηκεύει τους χρήστες σε αρχείο csv καταχωρώντας το username και το password τους.
+    """
+    with open(arxeio, mode="w", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames= ["username", "password", "user_total_hours"]) # Πρέπει να βάλω και τον ελεύθερο χρόνο που έχει ο χρήστης.
+        writer.writeheader()
+        writer.writerows(users)
 
+# Φόρτωση χρηστών απο csv
+def load_users_from_csv(arxeio = "users.csv"):
+    """
+        Φορτώνει τα στοιχεία χρηστών (username, password, ελύθερος χρόνος) απο το αρχείο csv.
+    """
+    try:
+        with open (arxeio,mode="r", newline="") as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                users.append({"username" : row['username'] , "password" : row['password'], "user_total_hours" : row['user_total_hours']}) # Πρέπει να βάλω και τον ελεύθερο χρόνο που έχει ο χρήστης.
+    except FileNotFoundError:
+        print("Το αρχείο χρηστών δεν βρέθηκε. Δημιουργεία νέου αρχείου με την προσθήκη νέου χρήστη.")
+
+# Σύνδεση χρήστη
+def connect_user(users):
+    """
+        Καλέι τον χρήστη να εισάγει το username και το password του. Αν τα στοιχεία αυτά(συνδυασμός username και password)
+        αντιστιχούν με κάποιο dictionary στην λίστα users τότε έχω επιτυχή είσοδο και προχωράω στις κύριες λειτουργίες του προγράμματος.
+
+    """
+    username = input("Παρακαλώ πληκτρολογείστε το username σας: ").strip()
+    password = input("Παρακαλώ πληκτρολογείστε τον κωδικό σας: ").strip()
+
+    for user in users:
+        if user["username"] == username and user["password"] == password:
+            print(f"\nΟ χρήστης {user['username']} συνδέθηκε επιτυχώς.")
+            return username
+    else:
+        print("\nΛανθασμένα στοιχεία εισόδου.")
+        
+# Μενού εισόδου χρήστη ή δημιουργεία νέου
+def login_menu():
+    print("Time Management Login\n")
+    print("1. Εγγραφή νέου χρήστη")
+    print("2. Σύνδεση χρήστη")
+    print("3. Έξοδος")
 
 # Μενού
 def display_menu():
@@ -203,20 +305,24 @@ def eleutheros_xronos(total_activities):
         Εισάγει τον ελεύθερο χρόνο. Αν ο χρήστης επιλέξει να προσθέσει περισσότερο νέο χρόνο τότε:
         απο τον νέο χρόνο που πρόσθεσε αφαιρούνται οι ώρες που απαιτούνται για τις ήδη υπάρχουσες δραστηριότητες.
     """
+    print (total_activities)
     while True:
         try:
-            total_hours = input("Παρακαλώ εισάγετε τις συνολικές ώρες που έχετε διαθέσιμες για αυτήν την εβδομάδα: ").strip()
-            total_hours = float(total_hours)
+            user_total_hours = input("Παρακαλώ εισάγετε τις συνολικές ώρες που έχετε διαθέσιμες για αυτήν την εβδομάδα: ").strip()
+            user_total_hours = float(user_total_hours)
             
-            if total_hours and 0 <= total_hours <= 168 and total_hours >= total_activities:
-                total_hours -= total_activities
+            if user_total_hours and 0 <= user_total_hours <= 168 and user_total_hours - total_activities > 0:
+                user_total_hours -= total_activities
                 if activities:
                     print(f"\nΑφαιρέθηκαν {total_activities} ώρες από τον νέο συνολικό σας χροόνο για τις ήδη υπάρχουσες δραστηριότητές σας.")
-                    print(f"\nΟ νέος συνολικός ελεύθερος χρόνος σας είναι: {total_hours}.")
-                return total_hours
+                    print(f"\nΟ νέος συνολικός ελεύθερος χρόνος σας είναι: {user_total_hours}.")
+
+                return user_total_hours
             else:
-                if total_activities > total_hours:
+                if total_activities > user_total_hours:
                     print(f"\nΕισάγετε παραπάνω ώρες! Απαιτούνται {total_activities} ώρες για τις ήδη υπάρχουσες δραστηριότητές σας.")
+                elif total_activities == user_total_hours:
+                    print(f"Εισάγετε παραπάνω ώρες. Απαιτούνται ήδη {user_total_hours} για τις υπάρχουσες δραστηριότητες.")
                 else:
                     print("Οι συνολικές διαθέσιμές ώρες δεν μπορούν να είναι αρνητικός αριθμός ή περισσότερες από τις 168 ώρες της εβδομάδας.")
                 
@@ -224,32 +330,32 @@ def eleutheros_xronos(total_activities):
             print ("Μή έγκυρη είσοδος. Παρακαλώ εισάγετε τον αριθμό των διαθέσιμων ωρών.")
 
 # Εμφάνιση του συνολικού ελεύθερου χρόνου
-def display_FreeTime(x,activities):
+def display_FreeTime(user_total_hours,user_activities):
     """Προβάλει τον διαθέσιμο ελεύθερο χρόνο"""
     
-    if x > 0:
-        print("\nΟ συνολικός ελεύθερος χρόνος σας για αυτή την εβδομάδα είναι: ", x, "ώρες.")
+    if user_total_hours > 0:
+        print("\nΟ συνολικός ελεύθερος χρόνος σας για αυτή την εβδομάδα είναι: ", user_total_hours, "ώρες.")
     else:
-        if not activities:
+        if not user_activities:
             print("\nΔεν έχετε εισάγει τον διαθέσιμο ελεύθερο χρόνο σας. Παρακαλώ πατήστε το 6 για προσθήκη ελεύθερου χρόνου.")
         else:
             print("\nΔεν έχετε διαθέσιμό ελεύθερο χρόνο, παρακαλώ τροποποιήστε ή διαγράψτε κάποια δραστηριότητα για να ελευθερώσετε χρόνο ή πατήστε 6 για να προσθέσετε ελεύθερο χρόνο")
             
 # Συνάρτηση εισαγωγής διάρκειας δραστηριότητας
-def duration(total_hours):
+def duration(user_total_hours):
     
     # Εισαγωγή διάρκειας με έλεγχο ορθότητας (Δεν μπορεί να υπερβαίνει τον συνολικό ελεύθερο χρόνο, τις 168 ώρες της εβδομάδας και να είναι αρνητική ή χαρακτήρας).
     while True:
         try:
             diarkeia = input ("\nΔώστε την διάρκεια της δραστηριότητας σε ώρες: ").strip()
             diarkeia = float(diarkeia)
-            if diarkeia and 0 < diarkeia <= total_hours:
-                total_hours -= diarkeia
-                return diarkeia, total_hours
+            if diarkeia and 0 < diarkeia <= user_total_hours:
+                user_total_hours -= diarkeia
+                return diarkeia, user_total_hours
             else:
-                if diarkeia + total_hours > weekly_hours:
+                if diarkeia + user_total_hours > weekly_hours:
                     print(f"")
-                print(f"\nΗ διάρκεια πρέπει να είναι θετικός αριθμός και δεν μπορεί να ξεπερνάει τις {total_hours} διαθέσιμες ώρες ή τις 168 ώρες της εβδομάδας.")
+                print(f"\nΗ διάρκεια πρέπει να είναι θετικός αριθμός και δεν μπορεί να ξεπερνάει τις {user_total_hours} διαθέσιμες ώρες ή τις 168 ώρες της εβδομάδας.")
         except ValueError:
             print("\nΜή έγκυρη είσοδος, παρακαλώ εισάγετε έναν αριθμό ωρών.")
 
@@ -267,7 +373,7 @@ def importance():
             print("Μή έγκυρη τιμή.")
 
 # Προσθήκη δραστηριότητας
-def add_activity(total_hours , activities):
+def add_activity(user_total_hours, connected_user, user_activities, activities):
     
     """ Εισάγει νέα δραστηριότητα ελέγχοντας πρώτα αν δεν έχει μηδενιστεί ο ελεύθερος χρόνος (μέσω της terminate).
         Καλεί τις συναρτήσεις εισαγωγής: 
@@ -280,7 +386,7 @@ def add_activity(total_hours , activities):
     
     global terminate, total_ypoxrewseis, total_hobby, total_activities
     
-    if total_hours > 0 and activities:
+    if user_total_hours > 0 and user_activities:
         terminate=False
 
     if terminate == False: # Αν έχω διαθέσιμο ελεύθερο χρόνο μπορώ να εισάγω νέα δραστηριότητα
@@ -307,7 +413,7 @@ def add_activity(total_hours , activities):
             #onoma = name()
             while True:
                 onoma = name()
-                if any(activity["Δραστηριότητα"] == onoma for activity in activities):
+                if any(activity["Δραστηριότητα"] == onoma for activity in user_activities):
                     print("\nΗ δραστηριότητα υπάρχει ήδη.")
                 else:
                     break
@@ -315,11 +421,11 @@ def add_activity(total_hours , activities):
         #Εισαγωγή διάρκειας δραστηριότητας
 
             # αν οι συνολικές διαθέσιμες ώρες είναι 0 , εισαγωγή των ωρών πρώτα
-            if total_hours == 0:
-                total_hours = eleutheros_xronos(total_activities)
+            if user_total_hours == 0:
+                user_total_hours = eleutheros_xronos(total_activities)
            
             #Εισαγωγή διάρκειας δραστηριότητας
-            diarkeia, total_hours = duration(total_hours) # Δέχεται το total_hours για τον εκ νέου υπολογισμό του και το στέλνει πίσω μαζί με την diarkeia με το return 
+            diarkeia, user_total_hours = duration(user_total_hours) # Δέχεται το total_hours για τον εκ νέου υπολογισμό του και το στέλνει πίσω μαζί με την diarkeia με το return 
             total_activities += diarkeia # Υπολογισμός του συνολικού χρόνου που απαιτείται για όλες τις δραστηριότητες.
         
         # Eισαγωγή σημαντικότητας
@@ -327,7 +433,7 @@ def add_activity(total_hours , activities):
         
         
         # Αν μηδενίστηκαν οι ώρες με την είσοδο της τελευταίας δραστηριότητας:
-            if total_hours == 0: # Αν μηδενιστούν οι ελεύθερες ώρες τότε το terminate γινεταί True και δεν αφήνει να μπούμε εκ νέου στην λειτουργία προσθήκης δραστηριότητας
+            if user_total_hours == 0: # Αν μηδενιστούν οι ελεύθερες ώρες τότε το terminate γινεταί True και δεν αφήνει να μπούμε εκ νέου στην λειτουργία προσθήκης δραστηριότητας
                     print("\nΜε την προσθήκη αυτής της δραστηριότητας έχει εξαντληθεί ο διαθέσιμος ελεύθερος χρόνος σας!")
                     terminate = True 
         
@@ -335,6 +441,7 @@ def add_activity(total_hours , activities):
         # Εισαγωγή του στοιχείου στην λίστα με τα dictionaries
             # Αποθήκευση ως dictionary με όνομα activity
             activity = {
+                "username" : connected_user, # ------------------------------- Προστέθηκε τώρα
                 "Δραστηριότητα" : onoma,
                 "Διάρκεια" : diarkeia,
                 "Σημαντικότητα" : grade,
@@ -343,32 +450,37 @@ def add_activity(total_hours , activities):
             
             # Αν η επιλογή είναι 1 τότε προσθέτω την δραστηριότητα και στην λίστα με τις υποχρεώσεις.
             if choice == 1:
-                ypoxrewseis.append(activity)
+                user_ypoxrewseis.append(activity)
                 total_ypoxrewseis += diarkeia # Υπολογισμός του συνολικού χρόνου που απαιτείται για τις υποχρεώσεις.
             else: # Αν η επιλογή είναι 2 τότε προσθέτω την δραστηριότητα και στην λίστα με τα χόμπι.
-                hobby.append(activity)
+                user_hobby.append(activity)
                 total_hobby += diarkeia # Υπολογισμός του συνολικού χρόνου που απαιτείται για τα χόμπι.
-            
+            print ("Afou exei kataxwrithei i drasthriotita se hobby i ypoxrewsh mesa sthn add kai prin bgw apo tin add, ta xompi einai: ", user_hobby)
             
             # Προσθήκη του dictionary στην λίστα 
+            user_activities.append(activity)
             activities.append(activity)
+            for user in users:
+                if connected_user == user["username"]:
+                    user["user_total_hours"] = user_total_hours
+            
             #save_activities_to_csv()
-            return total_hours, total_hobby, total_ypoxrewseis, total_activities
+            return user_total_hours, total_hobby, total_ypoxrewseis, total_activities
     else:
         print("\nΔεν έχετε διαθέσιμό ελεύθερο χρόνο, παρακαλώ τροποποιήστε ή διαγράψτε κάποια δραστηριότητα ή επιλέξτε να προσθέσετε ελεύθερο χρόνο")   
-        return total_hours , total_hobby, total_ypoxrewseis, total_activities #BUG!
+        return user_total_hours , total_hobby, total_ypoxrewseis, total_activities #BUG!
     
     """Άν μπεί με 0 για πρώτη φορά τότε τρέχει κανονικά την loop αφου το terminate εχει αρχικοποιηθεί σε False. Όμως το terminate γίνεται True.
         Αν μπεί για 2η συνεχόμενη φορά με 0 μέσω της επιλογής 1 απο το μενού τότε δεν επέστρεφε καμιά τιμή"""
 
 # Εμφάνιση όλων των αποθηκευμένων δραστηριοτήτων
-def display_activities(activities):
+def display_activities(user_activities):
     """Προβάλει τις αποθηκευμένες δραστηριότητες ή αν δεν υπάρχουν, ενημερώνει με κατάλληλο μήνυμα."""
-    if not activities:
+    if not user_activities:
         print("\nΔεν βρέθηκαν δραστηριότητες.\n")
     else:
         print("\nΟι δραστηριότητες που έχετε να κάνετε αυτή την εβδομάδα είναι: \n")
-        for drastiriotita in activities:
+        for drastiriotita in user_activities:
             print (f"{drastiriotita['Δραστηριότητα']} : Διάρκεια: {drastiriotita['Διάρκεια']} ώρες | Βαθμός σημαντικότητας: {drastiriotita['Σημαντικότητα']} | Τύπος: {drastiriotita['Τύπος']}")
 
 # Εμφάνιση όλων των αποθηκευμένων υποχρεώσεων
@@ -384,13 +496,13 @@ def display_ypoxrewseis(ypoxrewseis, total_ypoxrewseis):
         mesos_xronos(x="Υποχρεώσεις")
 
 # Εμφάνιση όλων των αποθηκευμένων χόμπι
-def display_hobby(hobby, total_hobby):
+def display_hobby(user_hobby, total_hobby):
     """Προβάλει τις αποθηκευμένες δραστηριότητες ελεύθερου χρόνου ή αν δεν υπάρχουν, ενημερώνει με κατάλληλο μήνυμα."""
-    if not hobby:
+    if not user_hobby:
         print("\nΔεν βρέθηκαν δραστηριότητες ελεύθερου χρόνου.\n")
     else:
         print("\nΤα χόμπι σας αυτή την εβδομάδα είναι: \n")
-        for drastiriotita in hobby:
+        for drastiriotita in user_hobby:
             print (f"{drastiriotita['Δραστηριότητα']} : Διάρκεια: {drastiriotita['Διάρκεια']} ώρες | Βαθμός σημαντικότητας: {drastiriotita['Σημαντικότητα']}")
         print("\nO συνολικός χρόνος που απαιτείται για χόμπι αυτή  την εβδομάδα είναι: ", total_hobby," ώρες")
         mesos_xronos(x="Χόμπι")
@@ -402,7 +514,7 @@ def modify(activities, total_hobby, total_ypoxrewseis):
         και καλεί ένα μενού επιλογών τροποποίησης. Ο χρήστης επιλέγει μια δυνατότητα με βάση το μενού. Κάθε φορά που πραγματοποιείται μια αλλαγή 
         ενημερώνεται η λίστα των δραστηριοτήτων και η συνάρτηση κλείνει και επιστρέφω στο κεντρικό μενού.
     """
-    global total_hours
+    global user_total_hours
     if not activities:
         print ("\nΔεν υπάρχουν δραστηριότητες για τροποποίηση.")
         return
@@ -443,11 +555,11 @@ def modify(activities, total_hobby, total_ypoxrewseis):
                         else:
                             # Aν η δραστηριότητα που θέλω να αλλάξω είναι Υποχρέωση τότε αλλάζω το όνομα της και στην λίστα ypoxrewseis()
                             if activity["Τύπος"] == "Υποχρέωση":
-                                for ypoxrewsi in ypoxrewseis:
+                                for ypoxrewsi in user_ypoxrewseis:
                                     if activity["Δραστηριότητα"] == ypoxrewsi["Δραστηριότητα"]:
                                         ypoxrewsi["Δραστηριότητα"] = onoma
                             else: # Aν η δραστηριότητα που θέλω να αλλάξω είναι χόμπι τότε αλλάζω το όνομα της και στην λίστα hobby()
-                                for xompi in hobby:
+                                for xompi in user_hobby:
                                     if activity["Δραστηριότητα"] == xompi["Δραστηριότητα"]:
                                         xompi["Δραστηριότητα"] = onoma
 
@@ -455,17 +567,17 @@ def modify(activities, total_hobby, total_ypoxrewseis):
                             activity["Δραστηριότητα"] = onoma
                             print("\nΤο όνομα της δραστηριότητας άλλαξε σε: ", activity["Δραστηριότητα"])
                             
-                            return total_hours, total_hobby, total_ypoxrewseis
+                            return user_total_hours, total_hobby, total_ypoxrewseis
                 elif dynatotita == 2:
                     # Αλλάζει το total_hours προσθέτωντας πίσω την προηγούμενη διάρκεια
-                    total_hours += activity["Διάρκεια"] 
-                    print("\nΟι διαθέσιμες ώρες σας είναι: " , total_hours, "ώρες.")
+                    user_total_hours += activity["Διάρκεια"] 
+                    print("\nΟι διαθέσιμες ώρες σας είναι: " , user_total_hours, "ώρες.")
                     # Κλήση της duration για εισαγωγή νέας διάρκειας και υπολογισμό του total_hours εκ νέου
-                    diarkeia, total_hours = duration(total_hours)
+                    diarkeia, user_total_hours = duration(user_total_hours)
 
                     # Aν η δραστηριότητα που θέλω να αλλάξω είναι Υποχρέωση τότε αλλάζω την Διάρκεια της και στην λίστα ypoxrewseis()
                     if activity["Τύπος"] == "Υποχρέωση":
-                        for ypoxrewsi in ypoxrewseis:
+                        for ypoxrewsi in user_ypoxrewseis:
                             if activity["Δραστηριότητα"] == ypoxrewsi["Δραστηριότητα"]:
                                 
                                 total_ypoxrewseis -= ypoxrewsi["Διάρκεια"]
@@ -475,7 +587,7 @@ def modify(activities, total_hobby, total_ypoxrewseis):
                                 total_ypoxrewseis += ypoxrewsi["Διάρκεια"]
                             
                     else: # Aν η δραστηριότητα που θέλω να αλλάξω είναι χόμπι τότε αλλάζω την Διάρκεια της και στην λίστα hobby()
-                        for xompi in hobby:
+                        for xompi in user_hobby:
                             if activity["Δραστηριότητα"] == xompi["Δραστηριότητα"]:
                                 total_hobby -= xompi["Διάρκεια"]
                                 xompi["Διάρκεια"] = diarkeia
@@ -484,15 +596,15 @@ def modify(activities, total_hobby, total_ypoxrewseis):
                     # Καταχώρηση αλλαγής διάρκειας στο dict
                     activity["Διάρκεια"] = diarkeia
                     print(f'\nH διάρκεια της δραστηριότητας "{activity['Δραστηριότητα']}" άλλαξε σε: {activity['Διάρκεια']} ώρες.')
-                    print("\nΟ νέος διαθέσιμος χρόνος είναι: ", total_hours)
-                    return total_hours, total_hobby, total_ypoxrewseis
+                    print("\nΟ νέος διαθέσιμος χρόνος είναι: ", user_total_hours)
+                    return user_total_hours, total_hobby, total_ypoxrewseis
                 elif dynatotita == 3:
                     activity["Σημαντικότητα"] = importance()
                     print(f'\nΟ βαθμός σημαντικότητας της δραστηριότητας "{activity["Δραστηριότητα"]}" άλλαξε σε {activity["Σημαντικότητα"]}')
-                    return total_hours, total_hobby, total_ypoxrewseis
+                    return user_total_hours, total_hobby, total_ypoxrewseis
                 else:
                     print ("\nΈξοδος απο το μενού τροποποίσης.")
-                    return total_hours, total_hobby, total_ypoxrewseis
+                    return user_total_hours, total_hobby, total_ypoxrewseis
                     
             # Αν η επιλογή δεν είναι έγκυρη      
             else:
@@ -572,21 +684,20 @@ def delete_activity(activities, total_ypoxrewseis, total_hobby, total_hours, tot
 # Μέσος χρόνος
 def mesos_xronos (x):
     if x== "Υποχρεώσεις":
-        mesos_ypoxrewseis = total_ypoxrewseis / len(ypoxrewseis)
+        mesos_ypoxrewseis = total_ypoxrewseis / len(user_ypoxrewseis)
         print (f"\nΟ μέσος χρόνος υποχρεώσεων για αυτή την εβδομάδα είναι: {mesos_ypoxrewseis:.1f} ώρες.")
     else:
-        mesos_hobby = total_hobby / len(hobby)
+        mesos_hobby = total_hobby / len(user_hobby)
         print (f"\nΟ μέσος χρόνος δραστηριοτήτων ελευθέρου χρόνου για αυτή την εβδομάδα είναι: {mesos_hobby:.1f} ώρες.")
     return
     
 # Αποθήκευση δραστηριοτήτων σε csv
 def save_activities_to_csv(arxeio = "activities.csv"):
     with open (arxeio, mode="w", newline="") as file:
-        writer = csv.DictWriter(file, fieldnames=["Δραστηριότητα","Διάρκεια","Σημαντικότητα","Τύπος"])
+        writer = csv.DictWriter(file, fieldnames=["username","Δραστηριότητα","Διάρκεια","Σημαντικότητα","Τύπος"]) #-------------- Προστέθηκε τώρα
         writer.writeheader()
         writer.writerows(activities)
         
-
 # Φόρτωση δραστηριοτήτων απο csv
 def load_activities_from_csv(arxeio = "activities.csv"):
     global activities, total_activities, total_hobby,total_ypoxrewseis
@@ -595,74 +706,160 @@ def load_activities_from_csv(arxeio = "activities.csv"):
             reader = csv.DictReader(file)
             for row in reader:
                 # Φόρτωμα και διαχείρηση των δραστηριοτήτων στην λίστα activities με όλες τις δραστηριότητες.
-                activities.append({"Δραστηριότητα" : row["Δραστηριότητα"], "Διάρκεια" : float(row["Διάρκεια"]), "Σημαντικότητα" : int(row["Σημαντικότητα"]), "Τύπος" : row["Τύπος"]})
-                total_activities += float(row["Διάρκεια"])
+                activities.append({"username": row["username"], "Δραστηριότητα" : row["Δραστηριότητα"], "Διάρκεια" : float(row["Διάρκεια"]), "Σημαντικότητα" : int(row["Σημαντικότητα"]), "Τύπος" : row["Τύπος"]})
+                #total_activities += float(row["Διάρκεια"])
                 # Ενημέρωση λίστας υποχρεώσεων.
-                if row["Τύπος"] == "Υποχρέωση":
-                    ypoxrewseis.append({"Δραστηριότητα" : row["Δραστηριότητα"], "Διάρκεια" : float(row["Διάρκεια"]), "Σημαντικότητα" : int(row["Σημαντικότητα"]), "Τύπος" : row["Τύπος"]})
-                    total_ypoxrewseis += float(row["Διάρκεια"])
+                """if row["Τύπος"] == "Υποχρέωση":
+                    user_ypoxrewseis.append({"username": row["username"],"Δραστηριότητα" : row["Δραστηριότητα"], "Διάρκεια" : float(row["Διάρκεια"]), "Σημαντικότητα" : int(row["Σημαντικότητα"]), "Τύπος" : row["Τύπος"]})
+                    #total_ypoxrewseis += float(row["Διάρκεια"])
                 else: # Ενημέρωση hobby.
-                    hobby.append({"Δραστηριότητα" : row["Δραστηριότητα"], "Διάρκεια" : float(row["Διάρκεια"]), "Σημαντικότητα" : int(row["Σημαντικότητα"]), "Τύπος" : row["Τύπος"]})
-                    total_hobby += float(row["Διάρκεια"])
-            #print(activities)
+                    user_hobby.append({"username": row["username"],"Δραστηριότητα" : row["Δραστηριότητα"], "Διάρκεια" : float(row["Διάρκεια"]), "Σημαντικότητα" : int(row["Σημαντικότητα"]), "Τύπος" : row["Τύπος"]})
+                    #total_hobby += float(row["Διάρκεια"])"""
 
-        return total_activities,total_ypoxrewseis,total_hobby
+        #return total_ypoxrewseis,total_hobby #total_activities
     except FileNotFoundError:
-        print("Δημιουργία αρχείου νέου χρήστη.")
+        print("Δημιουργία αρχείου δραστηριοτήτων.")
         activities = []
+
+# Επιλογή των δραστηριοτήτων που ανήκουν στον συνδεδεμένο χρήστη
+def get_user_activities(connected_user, activities):
+    global total_activities, total_hobby, total_ypoxrewseis
+    user_activities = []
+    user_ypoxrewseis = []
+    user_hobby = []
+    for activity in activities:
+        if activity["username"] == connected_user:
+            user_activities.append(activity)
+            total_activities += float(activity["Διάρκεια"])
+            if activity["Τύπος"] == "Υποχρέωση":
+                user_ypoxrewseis.append(activity)
+                total_ypoxrewseis += float(activity["Διάρκεια"])
+            else:
+                user_hobby.append(activity)
+                total_hobby += float(activity["Διάρκεια"])
         
+    return user_activities,total_activities, user_ypoxrewseis, total_ypoxrewseis, user_hobby ,total_hobby
+
+# Επιλογή του διαθέσιμου χόνου που ανήκει στον συνδεδεμένο χρήστη
+def get_user_total_hours(connected_user, users):
+    for user in users:
+        if user["username"] == connected_user:
+            user_total_hours = user["user_total_hours"]
+            user_total_hours = float(user_total_hours)
+    return user_total_hours
+
+# Ενημέρωση της λίστας users
+def update_users_list(connected_user, user_total_hours):
+    for user in users:
+        if connected_user == user["username"]:
+            user["user_total_hours"] = user_total_hours
+
+
+
+
 
 #--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Κυρίως πρόγραμμα
 def main():
-    global total_hours, terminate, total_hobby, total_ypoxrewseis, total_activities
+    """
+        Καλεί τα δεδομένα απο τα αρχεία csv. Στην συνέχεια προβάλει το αρχικό μενού login. Tο κυρίως πρόγραμμα εκτελείται μόνο εάν ο χρήστης επιλέξει 2 για είσοδο
+        χρήστη και η είσοδος είναι επιτυχημένη. Στην συνέχεια εμφανίζεται το κεντρικό μενού με τις δυνατήτες εισαγωγής, προβολής, τροποποίησης και διαγραφής δραστηριοτήτων
+        καθώς και επιλογή για την διαγραφή του προφίλ του ή για έξοδο απο το πρόγραμμα.
+    """
+    global user_total_hours, terminate, total_hobby, total_ypoxrewseis, total_activities, user_hobby, user_ypoxrewseis, user_activities
     terminate = False
     load_activities_from_csv()
-    
+    load_users_from_csv()
+    #user_hobby = []
+#       -------------------------------------------------------------------- ΠΡΟΒΟΛΗ ΜΕΝΟΥ ΕΙΣΟΔΟΥ --------------------------------------------------------------------
     while True:
-
-        display_menu()
-        leitourgia = epilogi(x=9)
+        login_menu()
+        leitourgia = epilogi(x=3)
         
+        # Αν ο χρήστης επιλέξει το 1 τότε γίνεται εγγραφή νέου χρήστη
         if leitourgia == 1:
-            total_hours, total_hobby, total_ypoxrewseis, total_activities = add_activity(total_hours , activities)
-            taksinomisi(activities)
-            taksinomisi(ypoxrewseis)
-            taksinomisi(hobby)
-            save_activities_to_csv()
-            
-           
+            add_user(users)
+        
+        # Αν ο χρήστης επιλέξει το 2 τότε γίνεται σύνδεση του χρήστη
         elif leitourgia == 2:
-            display_activities(activities) 
+            connected_user = connect_user(users)
+
+
+#           -------------------------------------------------------------------- ΚΥΡΙΩΣ ΠΡΟΓΡΑΜΜΑ --------------------------------------------------------------------
+            # Αν ο χρήστης συνδέθηκε επιτυχώς τότε προχωράω στο κυρίως πρόγραμμα.
+            if connected_user:
+                print(f"Συνδεδεμένος χρήστης: {connected_user}")
+                #user_activities = [] # Αρχικοποίηση της λίστας δραστηριοτήτων έτσι ώστε αν κάνει log out προηγούμενος χρήστης να μην κρατάει και τις δικές του δραστηριότητες.
+                #user_ypoxrewseis =[]
+                print ("ΤΕΣΤΤ τα χομπι κατα την εισοδο ειναι: ", user_hobby)
+                
+                print ("ΤΕΣΤΤ user ypoxrewseis κατα την εισοδο ειναι: ", user_ypoxrewseis)
+                print ("ΤΕΣΤΤ user activities κατα την εισοδο ειναι: ", user_activities)
+                #user_hobby = []
+                # Φόρτωση των δραστηριοτήτων που ανήκουν μόνο στον συνδεδεμένο χρήστη
+                if any(user.get("username") == connected_user for user in activities):  # Αν υπάρχει έστω και μία εγγραφή με το παρόν username, τότε υπάρχουν δραστηριότητες του χρήστη
+                    user_activities,total_activities, user_ypoxrewseis, total_ypoxrewseis, user_hobby ,total_hobby = get_user_activities(connected_user, activities)
+                
+                # Φόρτωση συνολικού διαθέσιμου χρόνου που ανήκει στον συνδεδεμένο χρήστη
+                user_total_hours = get_user_total_hours(connected_user, users)
+                print("TEST", user_total_hours)
+                while True:
+                    display_menu()
+                    leitourgia = epilogi(x=9)
+                    
+                    if leitourgia == 1:
+                        user_total_hours, total_hobby, total_ypoxrewseis, total_activities = add_activity(user_total_hours, connected_user, user_activities, activities) #-----------Προστέθηκε τώρα
+                        print("Ypoxrewseis sthn main ", user_ypoxrewseis)
+                        taksinomisi(activities)
+                        taksinomisi(user_ypoxrewseis)
+                        taksinomisi(user_hobby)
+                        save_activities_to_csv()
+                        save_user_to_csv()
+                        
+                    
+                    elif leitourgia == 2:
+                        display_activities(user_activities)
+                    
+                    elif leitourgia == 3:
+                        user_total_hours, total_hobby, total_ypoxrewseis = modify(activities,total_hobby, total_ypoxrewseis)
+                        taksinomisi(activities)
+                        taksinomisi(user_ypoxrewseis)
+                        taksinomisi(user_hobby)
+                        save_activities_to_csv()
+                    
+                    elif leitourgia == 4:
+                        total_ypoxrewseis, total_hobby, user_total_hours, total_activities = delete_activity(activities, total_ypoxrewseis, total_hobby, user_total_hours, total_activities, user_ypoxrewseis, user_hobby)
+                        save_activities_to_csv()
+                    
+                    elif leitourgia == 5:
+                        display_FreeTime(user_total_hours,user_activities)
+    
+                    elif leitourgia == 6:
+                        user_total_hours = eleutheros_xronos(total_activities)
+                        print (user_total_hours)
+                        print (users)
+                        update_users_list(connected_user, user_total_hours)
+                        save_user_to_csv()
+
+                    elif leitourgia == 7:
+                        
+                        display_ypoxrewseis(user_ypoxrewseis,total_ypoxrewseis)
+                    
+                    elif leitourgia == 8:
+                        display_hobby(user_hobby, total_hobby)
+                    
+                    else:
+                        print("\nΈξοδος χρήστη.\n")
+                        break
+#           -------------------------------------------------------------------- ΤΕΛΟΣ ΠΡΟΓΡΑΜΜΑΤΟΣ --------------------------------------------------------------------
         
-        elif leitourgia == 3:
-            total_hours, total_hobby, total_ypoxrewseis = modify(activities,total_hobby, total_ypoxrewseis)
-            taksinomisi(activities)
-            taksinomisi(ypoxrewseis)
-            taksinomisi(hobby)
-            save_activities_to_csv()
-        
-        elif leitourgia == 4:
-            total_ypoxrewseis, total_hobby, total_hours, total_activities = delete_activity(activities, total_ypoxrewseis, total_hobby, total_hours, total_activities, ypoxrewseis, hobby)
-            save_activities_to_csv()
-        elif leitourgia == 5:
-            #if activities:
-                display_FreeTime(total_hours,activities)
-            #else:
-                #print("\nΔεν έχετε εισάγει τον διαθέσιμο ελεύθερο χρόνο σας. Παρακαλώ πατήστε το 6 για προσθήκη ελεύθερου χρόνου.")
-        
-        elif leitourgia == 6:
-            total_hours = eleutheros_xronos(total_activities)
-        
-        elif leitourgia == 7:
-            display_ypoxrewseis(ypoxrewseis,total_ypoxrewseis)
-        
-        elif leitourgia == 8:
-            display_hobby(hobby, total_hobby)
-        
+        # Αν ο χρήστης επιλέξει το 3 τότε γίνεται έξοδος απο το πρόγραμμα
         else:
-            print("\nΈξοδος απο το πρόγραμμα.\n")
+            user_activities = []
+            user_ypoxrewseis = []
+            user_hobby = []
+            print("Έξοδος απο το πρόγραμμα.")
             break
 
 main()
