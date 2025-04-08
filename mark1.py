@@ -827,10 +827,12 @@ def main():
                         taksinomisi(user_ypoxrewseis)
                         taksinomisi(user_hobby)
                         save_activities_to_csv()
+                        save_user_to_csv()
                     
                     elif leitourgia == 4:
                         total_ypoxrewseis, total_hobby, user_total_hours, total_activities = delete_activity(activities, total_ypoxrewseis, total_hobby, user_total_hours, total_activities, user_ypoxrewseis, user_hobby)
                         save_activities_to_csv()
+                        save_user_to_csv()
                     
                     elif leitourgia == 5:
                         display_FreeTime(user_total_hours,user_activities)
