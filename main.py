@@ -193,106 +193,106 @@ def get_user_total_free_hours(connected_user, users):
 
 
 
-# Προσθήκη δραστηριότητας
-def add_activity(user_total_hours, connected_user, user_activities, activities):
+# # Προσθήκη δραστηριότητας
+# def add_activity(user_total_hours, connected_user, user_activities, activities):
 
-    """ Εισάγει νέα δραστηριότητα ελέγχοντας πρώτα αν δεν έχει μηδενιστεί ο ελεύθερος χρόνος (μέσω της terminate).
-        Καλεί τις συναρτήσεις εισαγωγής:
-        name() για: όνομα,
-        duration() για: διάρκεια,
-        eleutheros_xronos() για: ελεύθερο χρόνο(αν δεν έχει γίνει εισαγωγή ελεύθερου χρόνου πιο πριν),
-        importance() για: βαθμό σημαντικότητας.
-        Στην συνέχεια δημιουργεί dictionary για κάθε δραστηριότητα και το αποθηκεύει στην λίστα activities.
-    """
+#     """ Εισάγει νέα δραστηριότητα ελέγχοντας πρώτα αν δεν έχει μηδενιστεί ο ελεύθερος χρόνος (μέσω της terminate).
+#         Καλεί τις συναρτήσεις εισαγωγής:
+#         name() για: όνομα,
+#         duration() για: διάρκεια,
+#         eleutheros_xronos() για: ελεύθερο χρόνο(αν δεν έχει γίνει εισαγωγή ελεύθερου χρόνου πιο πριν),
+#         importance() για: βαθμό σημαντικότητας.
+#         Στην συνέχεια δημιουργεί dictionary για κάθε δραστηριότητα και το αποθηκεύει στην λίστα activities.
+#     """
 
-    global terminate, total_ypoxrewseis, total_hobby, total_activities
+#     global terminate, total_ypoxrewseis, total_hobby, total_activities
 
-    if user_total_hours > 0 and user_activities:
-        terminate=False
+#     if user_total_hours > 0 and user_activities:
+#         terminate=False
 
-    if terminate == False: # Αν έχω διαθέσιμο ελεύθερο χρόνο μπορώ να εισάγω νέα δραστηριότητα
-        while True:
+#     if terminate == False: # Αν έχω διαθέσιμο ελεύθερο χρόνο μπορώ να εισάγω νέα δραστηριότητα
+#         while True:
 
-        #Eπιλογή τύπου δραστηριότητας, 1 για Υποχρέωση ή 2 για Χόμπι.
-            while True:
-                try:
-                    choice = int(input(("Πληκτρολογείστε 1 για Υποχρέωση ή 2 για Χόμπι: ")))
-                    if choice in [1,2]:
-                        if choice == 1:
-                            type = "Υποχρέωση"
-                        else:
-                            type = "Χόμπι"
-                        break
-                    print("Η επιλογή δεν υπάρχει. Παρακαλώ προσπαθήστε ξανά.")
-                except ValueError:
-                    print("Μη έγκυρη είσοδος.")
-
-
+#         #Eπιλογή τύπου δραστηριότητας, 1 για Υποχρέωση ή 2 για Χόμπι.
+#             while True:
+#                 try:
+#                     choice = int(input(("Πληκτρολογείστε 1 για Υποχρέωση ή 2 για Χόμπι: ")))
+#                     if choice in [1,2]:
+#                         if choice == 1:
+#                             type = "Υποχρέωση"
+#                         else:
+#                             type = "Χόμπι"
+#                         break
+#                     print("Η επιλογή δεν υπάρχει. Παρακαλώ προσπαθήστε ξανά.")
+#                 except ValueError:
+#                     print("Μη έγκυρη είσοδος.")
 
 
 
-            #onoma = name()
-            while True:
-                onoma = name()
-                if any(activity["Δραστηριότητα"] == onoma for activity in user_activities):
-                    print("\nΗ δραστηριότητα υπάρχει ήδη.")
-                else:
-                    break
-
-        #Εισαγωγή διάρκειας δραστηριότητας
-
-            # αν οι συνολικές διαθέσιμες ώρες είναι 0 , εισαγωγή των ωρών πρώτα
-            if user_total_hours == 0:
-                user_total_hours = eleutheros_xronos(total_activities)
-
-            #Εισαγωγή διάρκειας δραστηριότητας
-            diarkeia, user_total_hours = duration(user_total_hours) # Δέχεται το total_hours για τον εκ νέου υπολογισμό του και το στέλνει πίσω μαζί με την diarkeia με το return
-            total_activities += diarkeia # Υπολογισμός του συνολικού χρόνου που απαιτείται για όλες τις δραστηριότητες.
-
-        # Eισαγωγή σημαντικότητας
-            grade = importance()
 
 
-        # Αν μηδενίστηκαν οι ώρες με την είσοδο της τελευταίας δραστηριότητας:
-            if user_total_hours == 0: # Αν μηδενιστούν οι ελεύθερες ώρες τότε το terminate γινεταί True και δεν αφήνει να μπούμε εκ νέου στην λειτουργία προσθήκης δραστηριότητας
-                    print("\nΜε την προσθήκη αυτής της δραστηριότητας έχει εξαντληθεί ο διαθέσιμος ελεύθερος χρόνος σας!")
-                    terminate = True
+#             #onoma = name()
+#             while True:
+#                 onoma = name()
+#                 if any(activity["Δραστηριότητα"] == onoma for activity in user_activities):
+#                     print("\nΗ δραστηριότητα υπάρχει ήδη.")
+#                 else:
+#                     break
+
+#         #Εισαγωγή διάρκειας δραστηριότητας
+
+#             # αν οι συνολικές διαθέσιμες ώρες είναι 0 , εισαγωγή των ωρών πρώτα
+#             if user_total_hours == 0:
+#                 user_total_hours = eleutheros_xronos(total_activities)
+
+#             #Εισαγωγή διάρκειας δραστηριότητας
+#             diarkeia, user_total_hours = duration(user_total_hours) # Δέχεται το total_hours για τον εκ νέου υπολογισμό του και το στέλνει πίσω μαζί με την diarkeia με το return
+#             total_activities += diarkeia # Υπολογισμός του συνολικού χρόνου που απαιτείται για όλες τις δραστηριότητες.
+
+#         # Eισαγωγή σημαντικότητας
+#             grade = importance()
 
 
-        # Εισαγωγή του στοιχείου στην λίστα με τα dictionaries
-            # Αποθήκευση ως dictionary με όνομα activity
-            activity = {
-                "username" : connected_user, # ------------------------------- Προστέθηκε τώρα
-                "Δραστηριότητα" : onoma,
-                "Διάρκεια" : diarkeia,
-                "Σημαντικότητα" : grade,
-                "Τύπος" : type
-            }
+#         # Αν μηδενίστηκαν οι ώρες με την είσοδο της τελευταίας δραστηριότητας:
+#             if user_total_hours == 0: # Αν μηδενιστούν οι ελεύθερες ώρες τότε το terminate γινεταί True και δεν αφήνει να μπούμε εκ νέου στην λειτουργία προσθήκης δραστηριότητας
+#                     print("\nΜε την προσθήκη αυτής της δραστηριότητας έχει εξαντληθεί ο διαθέσιμος ελεύθερος χρόνος σας!")
+#                     terminate = True
 
-            # Αν η επιλογή είναι 1 τότε προσθέτω την δραστηριότητα και στην λίστα με τις υποχρεώσεις.
-            if choice == 1:
-                user_ypoxrewseis.append(activity)
-                total_ypoxrewseis += diarkeia # Υπολογισμός του συνολικού χρόνου που απαιτείται για τις υποχρεώσεις.
-            else: # Αν η επιλογή είναι 2 τότε προσθέτω την δραστηριότητα και στην λίστα με τα χόμπι.
-                user_hobby.append(activity)
-                total_hobby += diarkeia # Υπολογισμός του συνολικού χρόνου που απαιτείται για τα χόμπι.
-            print ("Afou exei kataxwrithei i drasthriotita se hobby i ypoxrewsh mesa sthn add kai prin bgw apo tin add, ta xompi einai: ", user_hobby)
 
-            # Προσθήκη του dictionary στην λίστα
-            user_activities.append(activity)
-            activities.append(activity)
-            for user in users:
-                if connected_user == user["username"]:
-                    user["user_total_hours"] = user_total_hours
+#         # Εισαγωγή του στοιχείου στην λίστα με τα dictionaries
+#             # Αποθήκευση ως dictionary με όνομα activity
+#             activity = {
+#                 "username" : connected_user, # ------------------------------- Προστέθηκε τώρα
+#                 "Δραστηριότητα" : onoma,
+#                 "Διάρκεια" : diarkeia,
+#                 "Σημαντικότητα" : grade,
+#                 "Τύπος" : type
+#             }
 
-            #save_activities_to_csv()
-            return user_total_hours, total_hobby, total_ypoxrewseis, total_activities
-    else:
-        print("\nΔεν έχετε διαθέσιμό ελεύθερο χρόνο, παρακαλώ τροποποιήστε ή διαγράψτε κάποια δραστηριότητα ή επιλέξτε να προσθέσετε ελεύθερο χρόνο")
-        return user_total_hours , total_hobby, total_ypoxrewseis, total_activities #BUG!
+#             # Αν η επιλογή είναι 1 τότε προσθέτω την δραστηριότητα και στην λίστα με τις υποχρεώσεις.
+#             if choice == 1:
+#                 user_ypoxrewseis.append(activity)
+#                 total_ypoxrewseis += diarkeia # Υπολογισμός του συνολικού χρόνου που απαιτείται για τις υποχρεώσεις.
+#             else: # Αν η επιλογή είναι 2 τότε προσθέτω την δραστηριότητα και στην λίστα με τα χόμπι.
+#                 user_hobby.append(activity)
+#                 total_hobby += diarkeia # Υπολογισμός του συνολικού χρόνου που απαιτείται για τα χόμπι.
+#             print ("Afou exei kataxwrithei i drasthriotita se hobby i ypoxrewsh mesa sthn add kai prin bgw apo tin add, ta xompi einai: ", user_hobby)
 
-    """Άν μπεί με 0 για πρώτη φορά τότε τρέχει κανονικά την loop αφου το terminate εχει αρχικοποιηθεί σε False. Όμως το terminate γίνεται True.
-        Αν μπεί για 2η συνεχόμενη φορά με 0 μέσω της επιλογής 1 απο το μενού τότε δεν επέστρεφε καμιά τιμή"""
+#             # Προσθήκη του dictionary στην λίστα
+#             user_activities.append(activity)
+#             activities.append(activity)
+#             for user in users:
+#                 if connected_user == user["username"]:
+#                     user["user_total_hours"] = user_total_hours
+
+#             #save_activities_to_csv()
+#             return user_total_hours, total_hobby, total_ypoxrewseis, total_activities
+#     else:
+#         print("\nΔεν έχετε διαθέσιμό ελεύθερο χρόνο, παρακαλώ τροποποιήστε ή διαγράψτε κάποια δραστηριότητα ή επιλέξτε να προσθέσετε ελεύθερο χρόνο")
+#         return user_total_hours , total_hobby, total_ypoxrewseis, total_activities #BUG!
+
+#     """Άν μπεί με 0 για πρώτη φορά τότε τρέχει κανονικά την loop αφου το terminate εχει αρχικοποιηθεί σε False. Όμως το terminate γίνεται True.
+#         Αν μπεί για 2η συνεχόμενη φορά με 0 μέσω της επιλογής 1 απο το μενού τότε δεν επέστρεφε καμιά τιμή"""
 
 
 
