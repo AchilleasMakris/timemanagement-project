@@ -1,4 +1,5 @@
 import csv
+import matplotlib.pyplot as plt
 #TODO:Αν δεν έχω εισάγει δραστηριότητες και επιλέξω 3 - Τροποποίηση έχω error
  #---------------------------------------------------------Αρχικοποίηση μεταβλητών----------------------------------------------------------------
 
@@ -159,8 +160,9 @@ def display_menu():
     print("4. Διαγραφη δραστηριότητας")
     print("5. Εμφάνιση διαθέσιμου ελεύθερου χρόνου")
     print("6. Προσθήκη διαθέσιμου ελεύθερου χρόνου")
-    print("7. Εμφάνιση υποχρεώσεων")
-    print("8. Εμφάνιση δραστηριοτήτων ελεύθερου χρόνου")
+    print("7. Εμφάνιση Γραφήματος")
+    #print("7. Εμφάνιση υποχρεώσεων")
+    #print("8. Εμφάνιση δραστηριοτήτων ελεύθερου χρόνου")
     print("9. Έξοδος")
 
 
@@ -197,7 +199,6 @@ def get_user_total_free_hours(connected_user, users):
             user_total_free_hours = float(user["user_total_free_hours"])
     return user_total_free_hours
 
-
 # Συνάρτηση εισαγωγής ονόματος δραστηριότητας ΄ή υποχρέωσης
 def name():
     """Εισάγει / τροποποιεί το όνομα της δραστηριότητας"""
@@ -231,7 +232,6 @@ def duration(user_total_free_hours):
         except ValueError:
             print("\nΜή έγκυρη είσοδος, παρακαλώ εισάγετε έναν αριθμό ωρών.")
         
-
 # Εισαγωγή συνολικού ελεύθερου χρόνου
 def eleutheros_xronos(total_activity_hours):
     #TODO CHECK user_total_free_hours για temp
@@ -264,7 +264,6 @@ def eleutheros_xronos(total_activity_hours):
         except ValueError:
             print ("Μή έγκυρη είσοδος. Παρακαλώ εισάγετε τον αριθμό των διαθέσιμων ωρών.")
 
-
 # Συνάρτηση εισαγωγής βαθμού σημαντικότητας
 def importance():
     while True:
@@ -277,8 +276,6 @@ def importance():
                 print("Παρακαλώ δώστε έναν βαθμό απο το 1 εώς το 10.")
         except ValueError:
             print("Μή έγκυρη τιμή.")
-
-
 
 # Προσθήκη δραστηριότητας
 def add_activity(user_total_free_hours, connected_user, user_activities, activities):
@@ -571,7 +568,6 @@ def delete_activity(user_activities, total_ypoxrewseis_hours, total_hobby_hours,
                 for activity in user_activities:
                     print (f"{activity['Δραστηριότητα']}")
 
-    
 # Εμφάνιση του συνολικού ελεύθερου χρόνου
 def display_FreeTime(user_total_free_hours,user_activities):
     """Προβάλει τον διαθέσιμο ελεύθερο χρόνο"""
@@ -584,14 +580,103 @@ def display_FreeTime(user_total_free_hours,user_activities):
         else:
             print("\nΔεν έχετε διαθέσιμό ελεύθερο χρόνο, παρακαλώ τροποποιήστε ή διαγράψτε κάποια δραστηριότητα για να ελευθερώσετε χρόνο ή πατήστε 6 για να προσθέσετε ελεύθερο χρόνο")
 
-
-
 # Ενημέρωση της λίστας users
 def update_users_list(connected_user, user_total_free_hours):
     for user in users:
         if connected_user == user["username"]:
             user["user_total_free_hours"] = user_total_free_hours
 
+def plot_pie_chart(user_activities, user_total_free_hours):
+    """
+    Δημιουργεί ένα γράφημα πίτας που δείχνει την κατανομή του χρόνου.
+
+    Args:
+        user_activities (list): Λίστα με τις δραστηριότητες του χρήστη.
+        user_total_free_hours (float): Ο εναπομείνων ελεύθερος χρόνος του χρήστη.
+
+    Returns:
+        None
+    """
+    # Έλεγχος αν υπάρχουν δεδομένα για απεικόνιση
+    if not user_activities and user_total_free_hours <= 0:
+        print("Δεν υπάρχουν δραστηριότητες ή ελεύθερος χρόνος για απεικόνιση.")
+        return
+    
+    # Δημιουργία λιστών για ετικέτες και μεγέθη
+    labels = [activity['Δραστηριότητα'] for activity in user_activities]
+    sizes = [float(activity['Διάρκεια']) for activity in user_activities]
+    
+    # Προσθήκη ελεύθερου χρόνου αν είναι μεγαλύτερος από 0
+    if user_total_free_hours > 0:
+        labels.append("Ελεύθερος χρόνος")
+        sizes.append(user_total_free_hours)
+    
+    # Προσαρμοσμένη συνάρτηση για εμφάνιση ωρών
+    def autopct_format(pct, allvals):
+        absolute = int(pct / 100. * sum(allvals))
+        return f"{absolute} ώρες"
+    
+    # Δημιουργία γράφηματος πίτας
+    plt.pie(sizes, labels=labels, autopct=lambda pct: autopct_format(pct, sizes))
+    plt.title("Κατανομή Χρόνου")
+    plt.show()
+
+def plot_bar_chart(user_activities, user_total_free_hours):
+    """
+    Δημιουργεί ένα γράφημα στηλών που δείχνει τις ώρες ανά δραστηριότητα.
+
+    Args:
+        user_activities (list): Λίστα με τις δραστηριότητες του χρήστη.
+        user_total_free_hours (float): Ο συνολικός ελεύθερος χρόνος του χρήστη.
+
+    Returns:
+        None
+    """
+    if not user_activities:
+        print("Δεν υπάρχουν δραστηριότητες για απεικόνιση.")
+        return
+    
+    # Εξαγωγή ονομάτων και ωρών
+    names = [activity['Δραστηριότητα'] for activity in user_activities]
+    hours = [float(activity['Διάρκεια']) for activity in user_activities]
+    
+    # Ορισμός παλέτας χρωμάτων
+    colors = plt.get_cmap('tab10').colors
+    
+    # Δημιουργία μπαρών
+    bars = plt.bar(names, hours, color=colors[:len(names)])
+    
+    # Προσθήκη τιμών πάνω από τις μπάρες
+    for bar in bars:
+        yval = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2, yval + 0.5, f"{yval} ώρες", ha='center', va='bottom')
+    
+    # Προσθήκη οριζόντιας γραμμής για τον ελεύθερο χρόνο
+    plt.axhline(y=user_total_free_hours, color='r', linestyle='--', label='Ελεύθερος Χρόνος')
+    
+    # Προσθήκη κειμένου για τον ελεύθερο χρόνο
+    if len(names) > 0:
+        plt.text(len(names)-0.5, user_total_free_hours + 0.5, f"Ελεύθερος Χρόνος: {user_total_free_hours} ώρες", color='r', va='bottom')
+    
+    # Προσθήκη λεζάντας
+    plt.legend()
+    
+    # Τίτλοι και ετικέτες
+    plt.xlabel("Δραστηριότητες")
+    plt.ylabel("Ώρες")
+    plt.title("Ώρες ανά Δραστηριότητα")
+    
+    # Περιστροφή ετικετών
+    plt.xticks(rotation=45, ha='right')
+    
+    # Προσθήκη grid
+    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    
+    # Αυτόματη προσαρμογή αποστάσεων
+    plt.tight_layout()
+    
+    # Εμφάνιση του γραφήματος
+    plt.show()
 #-------------------------------------------------------------------------------------------------------------------------------------------------
 
 def main():
@@ -685,16 +770,28 @@ def main():
                         print (users)
                         update_users_list(connected_user, user_total_free_hours)
                         save_user_to_csv()
+                   
+
+                    elif leitourgia == 7:
+                        print("\nΕπιλογές γραφημάτων:")
+                        print("1. Γράφημα πίτας")
+                        print("2. Γράφημα στηλών")
+                        print("3. Επιστροφή στο κύριο μενού")
+                        chart_choice = epilogi(x=3)
+                        if chart_choice == 1:
+                            plot_pie_chart(user_activities, user_total_free_hours)
+                        elif chart_choice == 2:
+                            plot_bar_chart(user_activities, user_total_free_hours)
+                        else:
+                            print("\nΕπιστροφή στο κύριο μενού.")
+                    
                     else:
                         save_user_to_csv()
                         save_activities_to_csv()
                         clear_data(user_activities, user_ypoxrewseis, user_hobbies) # Διαγραφή των λιστών του χρήστη
                         print("\nΈξοδος χρήστη.\n")
                         break
-                   
-
                     """"
-                    elif leitourgia == 7:
 
                         display_ypoxrewseis(user_ypoxrewseis,total_ypoxrewseis)
 
@@ -707,7 +804,5 @@ def main():
     # Αν ο χρήστης επιλέξει το 3 τότε γίνεται τερματισμός του προγράμματος.
         else:
             break
-
-
 
 main()  # Εκκίνηση του προγράμματος
