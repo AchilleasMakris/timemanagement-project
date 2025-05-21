@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import tkinter.messagebox as messagebox
-import hashlib
+from tkinter import StringVar
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from main import *  # Import all functions from main.py
@@ -71,10 +71,14 @@ def show_login_frame():
             messagebox.showerror("Error", message)
 
     # Buttons
-    login_button = ctk.CTkButton(root, text="Σύνδεση", command=login)
-    login_button.pack(pady=10)
-    register_button = ctk.CTkButton(root, text="Εγγραφή", command=register)
-    register_button.pack(pady=10)
+    button_frame = ctk.CTkFrame(root, fg_color="transparent")
+    button_frame.pack(pady=10)
+
+    # Buttons
+    login_button = ctk.CTkButton(button_frame, text="Σύνδεση", command=login)
+    login_button.pack(side="left", padx=5, pady=20)
+    register_button = ctk.CTkButton(button_frame, text="Εγγραφή", command=register)
+    register_button.pack(side="left", padx=5, pady=20)
 
 # Main Menu Frame
 def show_main_menu():
@@ -156,24 +160,43 @@ def show_add_task_frame():
     importance_entry = ctk.CTkEntry(root, width=200)
     importance_entry.pack()
 
-    type_label = ctk.CTkLabel(root, text="Τύπος (Υποχρέωση/Χόμπι):")
+    # Type Toggle
+    type_label = ctk.CTkLabel(root, text="Τύπος Δραστηριότητας:")
     type_label.pack(pady=5)
-    type_entry = ctk.CTkEntry(root, width=200)
-    type_entry.pack()
 
+    selected_type = {"value": None}
+
+    button_frame = ctk.CTkFrame(root, fg_color="transparent")
+    button_frame.pack(pady=5)
+
+    def select_type(choice):
+        selected_type["value"] = choice
+        if choice == "Υποχρέωση":
+            ypoxrewsh_button.configure(fg_color="#1f6aa5")
+            hobby_button.configure(fg_color="transparent")
+        else:
+            hobby_button.configure(fg_color="#1f6aa5")
+            ypoxrewsh_button.configure(fg_color="transparent")
+
+    ypoxrewsh_button = ctk.CTkButton(button_frame, text="Υποχρέωση", width=100, command=lambda: select_type("Υποχρέωση"))
+    ypoxrewsh_button.pack(side="left", padx=5)
+
+    hobby_button = ctk.CTkButton(button_frame, text="Χόμπι", width=100, command=lambda: select_type("Χόμπι"))
+    hobby_button.pack(side="left", padx=5)
+
+    # Add Activity Logic
     def add_task():
         name = name_entry.get().strip()
         duration = duration_entry.get().strip()
         importance = importance_entry.get().strip()
-        task_type = type_entry.get().strip()
+        task_type = selected_type["value"]
+
         if name and duration and importance and task_type:
             try:
                 duration = float(duration)
                 importance = int(importance)
                 if not (1 <= importance <= 10):
                     raise ValueError("Η σημαντικότητα πρέπει να είναι μεταξύ 1-10")
-                if task_type not in ["Υποχρέωση", "Χόμπι"]:
-                    raise ValueError("Ο τύπος πρέπει να είναι Υποχρέωση or Χόμπι")
                 Επιτυχία, message, _ = add_activity(current_user, name, duration, importance, task_type, activities, users)
                 if Επιτυχία:
                     messagebox.showinfo("Επιτυχία", message)
@@ -181,12 +204,13 @@ def show_add_task_frame():
                 else:
                     messagebox.showerror("Σφάλμα", message)
             except ValueError as e:
-                messagebox.showerror("Σφάλμα", str(e) if str(e) else "Invalid input. Duration must be a number, importance 1-5.")
+                messagebox.showerror("Σφάλμα", str(e))
         else:
             messagebox.showerror("Σφάλμα", "Απαιτούνται όλα τα πεδία.")
 
     add_button = ctk.CTkButton(root, text="Προσθήκη δραστηριότητας", command=add_task)
     add_button.pack(pady=10)
+
     back_button = ctk.CTkButton(root, text="Πίσω", command=show_main_menu)
     back_button.pack(pady=10)
 
@@ -242,7 +266,17 @@ def show_edit_task_frame():
     name_entry = ctk.CTkEntry(root, width=200)
     duration_entry = ctk.CTkEntry(root, width=200)
     importance_entry = ctk.CTkEntry(root, width=200)
-    type_entry = ctk.CTkEntry(root, width=200)
+
+    selected_type = ctk.StringVar(value="")  # To store the selected type
+
+    def select_type(choice):
+        selected_type.set(choice)
+        if choice == "Υποχρέωση":
+            ypoxrewsh_button.configure(fg_color="#1f6aa5")
+            hobby_button.configure(fg_color="transparent")
+        else:
+            hobby_button.configure(fg_color="#1f6aa5")
+            ypoxrewsh_button.configure(fg_color="transparent")
 
     def load_task_details():
         selected_task = task_combobox.get()
@@ -254,8 +288,7 @@ def show_edit_task_frame():
                 duration_entry.insert(0, str(task["Διάρκεια"]))
                 importance_entry.delete(0, "end")
                 importance_entry.insert(0, str(task["Σημαντικότητα"]))
-                type_entry.delete(0, "end")
-                type_entry.insert(0, task["Τύπος"])
+                select_type(task["Τύπος"])  # Pre-select the type and update colors
                 break
 
     ctk.CTkButton(root, text="Φόρτωση δραστηριότητας", command=load_task_details).pack(pady=10)
@@ -265,8 +298,17 @@ def show_edit_task_frame():
     duration_entry.pack()
     ctk.CTkLabel(root, text="Συμαντικότητα (1-10):").pack(pady=5)
     importance_entry.pack()
-    ctk.CTkLabel(root, text="Τύπος (Υποχρέωση/Χόμπι):").pack(pady=5)
-    type_entry.pack()
+    ctk.CTkLabel(root, text="Τύπος:").pack(pady=5)
+
+    # Frame to hold the buttons side by side
+    button_frame = ctk.CTkFrame(root)
+    button_frame.pack(pady=5)
+
+    ypoxrewsh_button = ctk.CTkButton(button_frame, text="Υποχρέωση", width=100, command=lambda: select_type("Υποχρέωση"))
+    ypoxrewsh_button.pack(side="left", padx=5)
+
+    hobby_button = ctk.CTkButton(button_frame, text="Χόμπι", width=100, command=lambda: select_type("Χόμπι"))
+    hobby_button.pack(side="left", padx=5)
 
     def save_changes():
         selected_task = task_combobox.get()
@@ -275,13 +317,13 @@ def show_edit_task_frame():
         new_duration = float(new_duration_str) if new_duration_str else None
         new_importance_str = importance_entry.get().strip()
         new_importance = int(new_importance_str) if new_importance_str and 1 <= int(new_importance_str) <= 10 else None
-        new_type = type_entry.get().strip() or None
+        new_type = selected_type.get()
 
         if new_importance_str and (not new_importance or not (1 <= new_importance <= 10)):
             messagebox.showerror("Σφάλμα", "Ο βαθμός σημαντικότητας πρέπει να είναι 1-10")
             return
-        if new_type and new_type not in ["Υποχρέωση", "Χόμπι"]:
-            messagebox.showerror("Σφάλμα", "Ο τύπος δραστηριότητας  Υποχρέωση or Χόμπι")
+        if new_type not in ["Υποχρέωση", "Χόμπι"]:
+            messagebox.showerror("Σφάλμα", "Ο τύπος δραστηριότητας πρέπει να είναι Υποχρέωση ή Χόμπι")
             return
 
         Επιτυχία, message = modify_activity(current_user, selected_task, new_onoma=new_name, new_diarkeia=new_duration, new_grade=new_importance, new_type=new_type, activities=activities, users=users)
@@ -293,7 +335,7 @@ def show_edit_task_frame():
 
     ctk.CTkButton(root, text="Αποθήκευση αλλαγών", command=save_changes).pack(pady=10)
     ctk.CTkButton(root, text="Πίσω", command=show_main_menu).pack(pady=10)
-
+    
 def show_delete_task_frame():
     clear_window()
     title_label = ctk.CTkLabel(root, text="Διαγραφή δραστηριότητας", font=("Arial", 20))
