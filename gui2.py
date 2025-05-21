@@ -412,7 +412,12 @@ def update_pie_chart():
         if user_total_free_hours > 0:
             labels.append("Ελεύθερος χρόνος")
             sizes.append(user_total_free_hours)
-        ax.pie(sizes, labels=labels, autopct='%1.1f%%')
+        
+        def autopct_format(pct, allvals):
+            absolute = int(round(pct / 100. * sum(allvals)))
+            return f"{absolute} ώρες"
+
+        ax.pie(sizes, labels=labels, autopct=lambda pct: autopct_format(pct, sizes))
         ax.set_title("Κατανομή Χρόνου")
         canvas = FigureCanvasTkAgg(fig, master=pie_chart_frame)
         canvas.draw()
