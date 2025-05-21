@@ -1,7 +1,7 @@
 import csv
 import matplotlib.pyplot as plt
 import hashlib
-#TODO: ΜΠΟΡΕΙ ΚΑΠΟΙΟΣ ΝΑ ΚΑΝΕΙ REGISTER/LOGIN ΜΕ EMPTY USER (ENTER ENTER)
+
 #TODO:Αν δεν έχω εισάγει δραστηριότητες και επιλέξω 3 - Τροποποίηση έχω error
  #---------------------------------------------------------Αρχικοποίηση μεταβλητών----------------------------------------------------------------
 
@@ -93,23 +93,30 @@ def hash_password(password):
     
 # Προσθήκη νέου χρήστη
 def register_user(username, password, password_confirm):
+     # Check για κενό όνομα/κωδικό
+    if not username.strip():
+        return False, "Το όνομα χρήστη δεν μπορεί να είναι κενό."
+    if not password.strip():
+        return False, "Ο κωδικός δεν μπορεί να είναι κενός."
     if any(u["username"] == username for u in users):
         return False, "Το όνομα χρήστη χρησιμοποιείται ήδη."
     if password != password_confirm:
         return False, "Οι κωδικοί δεν είναι ίδιοι."
-    password_hash = hash_password(password)  # Hash the password
+    password_hash = hash_password(password)
     user = {
         "username": username,
-        "password": password_hash,  # Store the hashed password
+        "password": password_hash,
         "user_total_free_hours": 0.0
     }
     users.append(user)
     save_user_to_csv()
     return True, f"Ο χρήστης {username} δημιουργήθηκε επιτυχώς."
 
-
 # Σύνδεση χρήστη
 def connect_user(username, password):
+    # Check για κενό όνομα/κωδικό
+    if not username.strip() or not password.strip():
+        return False, "Το όνομα χρήστη και ο κωδικός δεν μπορούν να είναι κενά."
     for user in users:
         if user["username"] == username and user["password"] == hash_password(password):
             return True, user
