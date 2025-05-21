@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import tkinter.messagebox as messagebox
-import hashlib
+from tkinter import StringVar
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from main import *  # Import all functions from main.py
@@ -156,24 +156,43 @@ def show_add_task_frame():
     importance_entry = ctk.CTkEntry(root, width=200)
     importance_entry.pack()
 
-    type_label = ctk.CTkLabel(root, text="Τύπος (Υποχρέωση/Χόμπι):")
+    # Type Toggle
+    type_label = ctk.CTkLabel(root, text="Τύπος Δραστηριότητας:")
     type_label.pack(pady=5)
-    type_entry = ctk.CTkEntry(root, width=200)
-    type_entry.pack()
 
+    selected_type = {"value": None}
+
+    button_frame = ctk.CTkFrame(root, fg_color="transparent")
+    button_frame.pack(pady=5)
+
+    def select_type(choice):
+        selected_type["value"] = choice
+        if choice == "Υποχρέωση":
+            ypoxrewsh_button.configure(fg_color="#1f6aa5")
+            hobby_button.configure(fg_color="transparent")
+        else:
+            hobby_button.configure(fg_color="#1f6aa5")
+            ypoxrewsh_button.configure(fg_color="transparent")
+
+    ypoxrewsh_button = ctk.CTkButton(button_frame, text="Υποχρέωση", width=100, command=lambda: select_type("Υποχρέωση"))
+    ypoxrewsh_button.pack(side="left", padx=5)
+
+    hobby_button = ctk.CTkButton(button_frame, text="Χόμπι", width=100, command=lambda: select_type("Χόμπι"))
+    hobby_button.pack(side="left", padx=5)
+
+    # Add Activity Logic
     def add_task():
         name = name_entry.get().strip()
         duration = duration_entry.get().strip()
         importance = importance_entry.get().strip()
-        task_type = type_entry.get().strip()
+        task_type = selected_type["value"]
+
         if name and duration and importance and task_type:
             try:
                 duration = float(duration)
                 importance = int(importance)
                 if not (1 <= importance <= 10):
                     raise ValueError("Η σημαντικότητα πρέπει να είναι μεταξύ 1-10")
-                if task_type not in ["Υποχρέωση", "Χόμπι"]:
-                    raise ValueError("Ο τύπος πρέπει να είναι Υποχρέωση or Χόμπι")
                 Επιτυχία, message, _ = add_activity(current_user, name, duration, importance, task_type, activities, users)
                 if Επιτυχία:
                     messagebox.showinfo("Επιτυχία", message)
@@ -181,12 +200,13 @@ def show_add_task_frame():
                 else:
                     messagebox.showerror("Σφάλμα", message)
             except ValueError as e:
-                messagebox.showerror("Σφάλμα", str(e) if str(e) else "Invalid input. Duration must be a number, importance 1-5.")
+                messagebox.showerror("Σφάλμα", str(e))
         else:
             messagebox.showerror("Σφάλμα", "Απαιτούνται όλα τα πεδία.")
 
     add_button = ctk.CTkButton(root, text="Προσθήκη δραστηριότητας", command=add_task)
     add_button.pack(pady=10)
+
     back_button = ctk.CTkButton(root, text="Πίσω", command=show_main_menu)
     back_button.pack(pady=10)
 
