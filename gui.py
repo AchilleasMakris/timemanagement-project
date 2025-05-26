@@ -192,6 +192,10 @@ def show_add_task_frame():
         task_type = selected_type["value"]
 
         if name and duration and importance and task_type:
+            # Ελεγχος: το όνομα δεν μπορεί να είναι κενό, να περιέχει αριθμούς ή να μην έχει γράμματα
+            if not name or not any(char.isalpha() for char in name):
+                messagebox.showerror("Σφάλμα", "Το όνομα της δραστηριότητας δεν μπορεί να είναι κενό ή να μην περιέχει γράμματα.")
+                return
             try:
                 duration = float(duration)
                 importance = int(importance)

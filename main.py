@@ -2,7 +2,6 @@ import csv
 import matplotlib.pyplot as plt
 import hashlib
 
-#TODO:Αν δεν έχω εισάγει δραστηριότητες και επιλέξω 3 - Τροποποίηση έχω error
  #---------------------------------------------------------Αρχικοποίηση μεταβλητών----------------------------------------------------------------
 
 users = []                      # Λίστα με όλους τους χρήστες
@@ -148,12 +147,16 @@ def get_user_activities(connected_user, activities, total_activity_hours, total_
 
 # Επιλογή του διαθέσιμου χόνου που ανήκει στον συνδεδεμένο χρήστη
 def get_user_total_free_hours(connected_user, users):
-    for user in users:
-        if user["username"] == connected_user:
-            user_total_free_hours = float(user["user_total_free_hours"])
-    return user_total_free_hours
+    while True:    
+        for user in users:
+            if user["username"] == connected_user:
+                user_total_free_hours = float(user["user_total_free_hours"])
+                if user_total_free_hours < 0 or user_total_free_hours > 168:
+                    continue
+            else:
+                return user_total_free_hours
 
-# Συνάρτηση εισαγωγής ονόματος δραστηριότητας ΄ή υποχρέωσης
+# Συνάρτηση εισαγωγής ονόματος δραστηριότητας ή υποχρέωσης
 def name():
     """Εισάγει / τροποποιεί το όνομα της δραστηριότητας"""
 
@@ -239,7 +242,6 @@ def add_activity(connected_user, onoma, diarkeia, grade, activity_type, activiti
     # Check if activity name already exists for this user
     if any(a["username"] == connected_user and a["Δραστηριότητα"] == onoma for a in activities):
         return False, "Η δραστηριότητα υπάρχει ήδη.", None
-    
     # Get user's current free time
     for user in users:
         if user["username"] == connected_user:
@@ -359,6 +361,9 @@ def set_free_time(connected_user, user_total_free_hours, activities, users):
     Returns:
         tuple: (success (bool), message (str))
     """
+    # Input validation: free time must be >0 and <=168
+    if user_total_free_hours <= 0 or user_total_free_hours > 168:
+        return False, "Ο συνολικός ελεύθερος χρόνος πρέπει να είναι μεγαλύτερος του 0 και μικρότερος ή ίσος με 168."
     total_activity_hours = sum(task["Διάρκεια"] for task in activities if task["username"] == connected_user)
     if user_total_free_hours < total_activity_hours:
         return False, f"Ο νέος χρόνος πρέπει να είναι τουλάχιστον {total_activity_hours} ώρες για τις υπάρχουσες δραστηριότητες."
