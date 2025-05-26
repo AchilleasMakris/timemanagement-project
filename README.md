@@ -48,3 +48,18 @@
    git clone https://github.com/AchilleasMakris/timemanagement-project.git
    cd timemanagement-project
    ```
+2. **Εγκατάσταση Εξαρτήσεων:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Εκτέλεση της Εφαρμογής:**
+   ```bash
+   python gui.py
+   ```
+
+## Σημειώσεις
+- Απαιτείται Python 3.8 ή νεότερη.
+- Τα δεδομένα χρηστών και δραστηριοτήτων αποθηκεύονται στα αρχεία `users.csv` και `activities.csv` αντίστοιχα.
+- Αν δεν υπάρχουν αυτά τα αρχεία, θα δημιουργηθούν αυτόματα κατά την πρώτη εκκίνηση.
+
+---
