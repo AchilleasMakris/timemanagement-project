@@ -26,32 +26,41 @@ def clear_window():
         widget.destroy()
 
 # Login Frame
-def show_login_frame():
-    global current_user
-    clear_window()
 
-    # Title
+def show_initial_login_menu():
+    clear_window()
     title_label = ctk.CTkLabel(root, text="Διαχείριση Ελεύθερου Χρόνου - Πλατφόρμα Σύνδεσης", font=("Arial", 20))
     title_label.pack(pady=20)
 
-    # Username Entry
+    button_frame = ctk.CTkFrame(root, fg_color="transparent")
+    button_frame.pack(pady=10)
+
+    login_button = ctk.CTkButton(button_frame, text="Σύνδεση", command=show_login_fields)
+    login_button.pack(side="left", padx=5, pady=20)
+    register_button = ctk.CTkButton(button_frame, text="Δημιουργία Χρήστη", command=show_register_fields)
+    register_button.pack(side="left", padx=5, pady=20)
+
+
+def show_login_fields():
+    clear_window()
+    title_label = ctk.CTkLabel(root, text="Σύνδεση Χρήστη", font=("Arial", 20))
+    title_label.pack(pady=20)
+
     username_label = ctk.CTkLabel(root, text="Όνομα χρήστη:")
     username_label.pack(pady=5)
     username_entry = ctk.CTkEntry(root, width=200)
     username_entry.pack()
 
-    # Password Entry
     password_label = ctk.CTkLabel(root, text="Κωδικός χρήστη:")
     password_label.pack(pady=5)
     password_entry = ctk.CTkEntry(root, width=200, show="*")
     password_entry.pack()
 
-    # Login Function using connect_user from main.py
     def login():
         global current_user
         username = username_entry.get().strip()
         password = password_entry.get().strip()
-        Επιτυχία, result = connect_user(username, password)  # Call backend function
+        Επιτυχία, result = connect_user(username, password)
         if Επιτυχία:
             current_user = username
             messagebox.showinfo("Επιτυχία", "Επιτυχής Σύνδεση.")
@@ -59,26 +68,41 @@ def show_login_frame():
         else:
             messagebox.showerror("Error", result)
 
-    # Register Function using register_user from main.py
+    login_button = ctk.CTkButton(root, text="Είσοδος", command=login)
+    login_button.pack(pady=10)
+    back_button = ctk.CTkButton(root, text="Πίσω", command=show_initial_login_menu)
+    back_button.pack(pady=10)
+
+
+def show_register_fields():
+    clear_window()
+    title_label = ctk.CTkLabel(root, text="Δημιουργία Χρήστη", font=("Arial", 20))
+    title_label.pack(pady=20)
+
+    username_label = ctk.CTkLabel(root, text="Όνομα χρήστη:")
+    username_label.pack(pady=5)
+    username_entry = ctk.CTkEntry(root, width=200)
+    username_entry.pack()
+
+    password_label = ctk.CTkLabel(root, text="Κωδικός χρήστη:")
+    password_label.pack(pady=5)
+    password_entry = ctk.CTkEntry(root, width=200, show="*")
+    password_entry.pack()
+
     def register():
         username = username_entry.get().strip()
         password = password_entry.get().strip()
-        # Pass password twice since GUI has only one password field
         Επιτυχία, message = register_user(username, password, password)
         if Επιτυχία:
             messagebox.showinfo("Επιτυχία", message)
+            show_initial_login_menu()
         else:
             messagebox.showerror("Error", message)
 
-    # Buttons
-    button_frame = ctk.CTkFrame(root, fg_color="transparent")
-    button_frame.pack(pady=10)
-
-    # Buttons
-    login_button = ctk.CTkButton(button_frame, text="Σύνδεση", command=login)
-    login_button.pack(side="left", padx=5, pady=20)
-    register_button = ctk.CTkButton(button_frame, text="Εγγραφή", command=register)
-    register_button.pack(side="left", padx=5, pady=20)
+    register_button = ctk.CTkButton(root, text="Δημιουργία Χρήστη", command=register)
+    register_button.pack(pady=10)
+    back_button = ctk.CTkButton(root, text="Πίσω", command=show_initial_login_menu)
+    back_button.pack(pady=10)
 
 # Main Menu Frame
 def show_main_menu():
@@ -91,7 +115,7 @@ def show_main_menu():
         ("Προσθήκη δραστηριότητας", show_add_task_frame),
         ("Επεξεργασία δραστηριότητας", show_edit_task_frame),
         ("Διαγραφή δραστηριότητας", show_delete_task_frame),
-        ("Ταξινόμιση κατα συμαντικότητα", lambda: show_sorted_activities_frame(current_user)),
+        ("Ταξινόμιση κατά σημαντικότητα", lambda: show_sorted_activities_frame(current_user)),
         ("Εμφάνιση δραστηριοτήτων", show_all_tasks_frame),
         ("Μέσος χρόνος δραστηριοτήτων", show_average_time_frame),
         ("Διάγραμμα Πίτας", show_pie_chart_frame),
@@ -101,6 +125,9 @@ def show_main_menu():
     for text, command in options:
         button = ctk.CTkButton(root, text=text, command=command, width=250)
         button.pack(pady=10)
+
+
+
 
 # Implemented Functions
 def show_manage_free_time_frame():
@@ -141,6 +168,12 @@ def show_manage_free_time_frame():
     back_button.pack(pady=10)
 
 def show_add_task_frame():
+    user = [u for u in users if u["username"] == current_user][0]
+    if (user["user_total_free_hours"] == 0):
+        clear_window()
+        show_manage_free_time_frame()
+        return # Σταματάει εδώ αν δεν έχει ελεύθερες ώρες
+  
     clear_window()
     title_label = ctk.CTkLabel(root, text="Προσθήκη νέας δραστηριότητας", font=("Arial", 20))
     title_label.pack(pady=20)
@@ -448,5 +481,5 @@ def show_bar_chart_frame():
 
 # Start the application
 if __name__ == "__main__":
-    show_login_frame()
+    show_initial_login_menu()
     root.mainloop()

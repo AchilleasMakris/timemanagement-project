@@ -250,8 +250,8 @@ def add_activity(connected_user, onoma, diarkeia, grade, activity_type, activiti
     else:
         return False, "Ο χρήστης δεν βρέθηκε.", None
     
-    # Check if enough free time is available
-    if diarkeia > user_total_free_hours:
+    # Check if enough free time is available    -------------------
+    #if diarkeia > user_total_free_hours:
         return False, f"Δεν υπάρχει αρκετός ελεύθερος χρόνος. Διαθέσιμος: {user_total_free_hours} ώρες.", None
     
     # Create new activity
