@@ -67,7 +67,7 @@ def show_login_fields():
             messagebox.showinfo("Επιτυχία", "Επιτυχής Σύνδεση.")
             show_main_menu()
         else:
-            messagebox.showerror("Error", result)
+            messagebox.showerror("Σφάλμα", result)
 
     login_button = ctk.CTkButton(root, text="Είσοδος", command=login)
     login_button.pack(pady=10)
@@ -98,7 +98,7 @@ def show_register_fields():
             messagebox.showinfo("Επιτυχία", message)
             show_initial_login_menu()
         else:
-            messagebox.showerror("Error", message)
+            messagebox.showerror("Σφάλμα", message)
 
     register_button = ctk.CTkButton(root, text="Δημιουργία Χρήστη", command=register)
     register_button.pack(pady=10)
@@ -273,7 +273,7 @@ def show_all_tasks_frame():
     
     remaining_hours = backup_user_free_hours
     
-    test = f"Ο ελεύθερος χρόνος του χρήστη είναι: {remaining_hours}"
+    test = f"Ο ελεύθερος χρόνος του χρήστη είναι: {remaining_hours} ώρες"
     efikti_label = ctk.CTkLabel(root, text=test)
     efikti_label.pack(pady=2)
     

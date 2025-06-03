@@ -230,8 +230,10 @@ def importance():
 def taksinomisi(current_user):
     # Clear and rebuild user_activities list for the connected user
     user_activities = [activity for activity in activities if activity["username"] == current_user]
-    # Sort by importance (highest first)
-    user_activities.sort(key=lambda x: x["Σημαντικότητα"], reverse=True)
+    
+    # Sort by type first (Υποχρέωση first), then by importance
+    user_activities.sort(key=lambda x: (0 if x["Τύπος"] == "Υποχρέωση" else 1, -x["Σημαντικότητα"]))
+    
     return user_activities
 
 def add_activity(connected_user, onoma, diarkeia, grade, activity_type, activities, users):
