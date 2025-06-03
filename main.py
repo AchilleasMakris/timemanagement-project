@@ -28,7 +28,7 @@ terminate = False               # Flag για έλεγχο τιμής
 # Αποθήκευση του χρήστη σε csv
 def save_user_to_csv(filename="users.csv"):
     with open(filename, mode="w", newline="", encoding='utf-8') as file:
-        writer = csv.DictWriter(file, fieldnames=["username", "password", "user_total_free_hours"])
+        writer = csv.DictWriter(file, fieldnames=["username", "password", "user_total_free_hours", "backup_user_free_hours"])
         writer.writeheader()
         writer.writerows(users)
 
@@ -42,7 +42,8 @@ def load_users_from_csv(filename="users.csv"):
                 users.append({
                     "username": row['username'],
                     "password": row['password'],
-                    "user_total_free_hours": float(row.get('user_total_free_hours', 0))
+                    "user_total_free_hours": float(row.get('user_total_free_hours')),
+                    "backup_user_free_hours": float(row.get('backup_user_free_hours'))
                 })
     except FileNotFoundError:
         pass  # File will be created on first save
@@ -105,7 +106,8 @@ def register_user(username, password, password_confirm):
     user = {
         "username": username,
         "password": password_hash,
-        "user_total_free_hours": 0.0
+        "user_total_free_hours": 0.0,
+        "backup_user_free_hours": 0.0
     }
     users.append(user)
     save_user_to_csv()
@@ -222,6 +224,15 @@ def importance():
                 print("Παρακαλώ δώστε έναν βαθμό απο το 1 εώς το 10.")
         except ValueError:
             print("Μή έγκυρη τιμή.")
+
+
+# Ταξινόμηση 
+def taksinomisi(current_user):
+    # Clear and rebuild user_activities list for the connected user
+    user_activities = [activity for activity in activities if activity["username"] == current_user]
+    # Sort by importance (highest first)
+    user_activities.sort(key=lambda x: x["Σημαντικότητα"], reverse=True)
+    return user_activities
 
 def add_activity(connected_user, onoma, diarkeia, grade, activity_type, activities, users):
     """
@@ -365,8 +376,8 @@ def set_free_time(connected_user, user_total_free_hours, activities, users):
     if user_total_free_hours <= 0 or user_total_free_hours > 168:
         return False, "Ο συνολικός ελεύθερος χρόνος πρέπει να είναι μεγαλύτερος του 0 και μικρότερος ή ίσος με 168."
     total_activity_hours = sum(task["Διάρκεια"] for task in activities if task["username"] == connected_user)
-    if user_total_free_hours < total_activity_hours:
-        return False, f"Ο νέος χρόνος πρέπει να είναι τουλάχιστον {total_activity_hours} ώρες για τις υπάρχουσες δραστηριότητες."
+    # if user_total_free_hours < total_activity_hours:
+    #     return False, f"Ο νέος χρόνος πρέπει να είναι τουλάχιστον {total_activity_hours} ώρες για τις υπάρχουσες δραστηριότητες."
     
     for user in users:
         if user["username"] == connected_user:

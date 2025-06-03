@@ -15,6 +15,7 @@ root.title("Διαχείριση Ελεύθερου Χρόνου")
 root.geometry("800x600")
 
 current_user = None  # Track the currently logged-in user
+backup_user_free_hours = 0
 
 # Load initial data
 load_users_from_csv()
@@ -134,8 +135,13 @@ def show_manage_free_time_frame():
     title_label = ctk.CTkLabel(root, text="Διαχείρηση ελεύθερου χρόνου", font=("Arial", 20))
     title_label.pack(pady=20)
 
-    user = next(u for u in users if u["username"] == current_user)
-    current_free_time = user["user_total_free_hours"]
+    # Find current user without using next()
+    current_free_time = 0
+    for user in users:
+        if user["username"] == current_user:
+            current_free_time = user["user_total_free_hours"]
+            break
+            
     free_time_label = ctk.CTkLabel(root, text=f"Υπολειπόμενος ελεύθερος: {current_free_time} ώρες.")
     free_time_label.pack(pady=10)
 
@@ -145,15 +151,22 @@ def show_manage_free_time_frame():
     user_total_free_hours_entry.pack()
 
     def update_free_time():
+        global backup_user_free_hours
         try:
-            # Get the input from the entry widget
             input_value = user_total_free_hours_entry.get().strip()
-            # Convert it to a float
             user_total_free_hours = float(input_value)
             if user_total_free_hours < 0:
                 raise ValueError("Δεν γίνεται να βάλετε αρνητικό αριθμό.")
+            
             success, message = set_free_time(current_user, user_total_free_hours, activities, users)
             if success:
+                # Update both user_total_free_hours and backup_user_free_hours
+                for user in users:
+                    if user["username"] == current_user:
+                        user["backup_user_free_hours"] = user_total_free_hours
+                        backup_user_free_hours = user_total_free_hours
+                        break
+                save_user_to_csv()  # Save to CSV
                 messagebox.showinfo("Επιτυχία", message)
                 show_main_menu()
             else:
@@ -165,6 +178,7 @@ def show_manage_free_time_frame():
     update_button.pack(pady=10)
     back_button = ctk.CTkButton(root, text="Πίσω", command=show_main_menu)
     back_button.pack(pady=10)
+
 
 def show_add_task_frame():
     clear_window()
@@ -244,39 +258,78 @@ def show_add_task_frame():
     back_button = ctk.CTkButton(root, text="Πίσω", command=show_main_menu)
     back_button.pack(pady=10)
 
+
 def show_all_tasks_frame():
     clear_window()
+    efiktes = []
+    anefiktes = []
+    
+    # Get backup_user_free_hours from users list instead of global variable
+    backup_user_free_hours = 0
+    for user in users:
+        if user["username"] == current_user:
+            backup_user_free_hours = user["backup_user_free_hours"]
+            break
+    
+    remaining_hours = backup_user_free_hours
+    
+    test = f"Ο ελεύθερος χρόνος του χρήστη είναι: {remaining_hours}"
+    efikti_label = ctk.CTkLabel(root, text=test)
+    efikti_label.pack(pady=2)
+    
+    # Get sorted activities for the current user
+    sorted_user_activities = taksinomisi(current_user)       
+    
+    for activity in sorted_user_activities:
+        if remaining_hours - activity['Διάρκεια'] >= 0:
+            efiktes.append(activity)
+            remaining_hours -= activity['Διάρκεια']
+        else:
+            anefiktes.append(activity)
+
     title_label = ctk.CTkLabel(root, text="Όλες οι δραστηριότητες", font=("Arial", 20))
     title_label.pack(pady=20)
 
-    user_tasks = [task for task in activities if task["username"] == current_user]
-    if not user_tasks:
-        no_tasks_label = ctk.CTkLabel(root, text="Δεν βρέθηκαν δραστηριότητες.")
-        no_tasks_label.pack(pady=10)
-    else:
-        for task in user_tasks:
-            task_str = f"{task['Δραστηριότητα']} - Duration: {task['Διάρκεια']} hours, Importance: {task['Σημαντικότητα']}, Type: {task['Τύπος']}"
-            task_label = ctk.CTkLabel(root, text=task_str)
-            task_label.pack(pady=5)
+    if efiktes:
+        title_label = ctk.CTkLabel(root, text="Εφικτές Δραστηριότητες", font=("Arial", 16))
+        title_label.pack(pady=20)
+        for efikti in efiktes:
+            efikti_str = f"{efikti['Δραστηριότητα']} - Διάρκεια: {efikti['Διάρκεια']} ώρες, Βαθμός Σημαντικότητας: {efikti['Σημαντικότητα']}, Τύπος: {efikti['Τύπος']}"
+            efikti_label = ctk.CTkLabel(root, text=efikti_str)
+            efikti_label.pack(pady=2)
+
+    if anefiktes:
+        title_label = ctk.CTkLabel(root, text="Ανέφικτες Δραστηριότητες", font=("Arial", 16))
+        title_label.pack(pady=20)
+        for anefikti in anefiktes:
+            anefikti_str = f"{anefikti['Δραστηριότητα']} - Διάρκεια: {anefikti['Διάρκεια']} ώρες, Βαθμός Σημαντικότητας: {anefikti['Σημαντικότητα']}, Τύπος: {anefikti['Τύπος']}"
+            anefikti_label = ctk.CTkLabel(root, text=anefikti_str)
+            anefikti_label.pack(pady=2)
+    
+    if not efiktes and not anefiktes:
+        no_activities_label = ctk.CTkLabel(root, text="Δεν βρέθηκαν δραστηριότητες.")
+        no_activities_label.pack(pady=10)
+
     back_button = ctk.CTkButton(root, text="Πίσω", command=show_main_menu)
     back_button.pack(pady=20)
 
-def show_sorted_activities_frame(username):
-    clear_window()
-    title_label = ctk.CTkLabel(root, text="Οι δραστηριότητες ταξινομίθηκας κατα συμαντικότητα", font=("Arial", 20))
-    title_label.pack(pady=20)
-    user_activities = [a for a in activities if a["username"] == username]
-    if not user_activities:
-        no_tasks_label = ctk.CTkLabel(root, text="Δεν βρέθηκαν δραστηριότητες.")
-        no_tasks_label.pack(pady=10)
-    else:
-        sorted_activities = sorted(user_activities, key=lambda x: x["Σημαντικότητα"], reverse=True)
-        for task in sorted_activities:
-            task_str = f"{task['Δραστηριότητα']} - Duration: {task['Διάρκεια']} hours, Importance: {task['Σημαντικότητα']}, Type: {task['Τύπος']}"
-            task_label = ctk.CTkLabel(root, text=task_str)
-            task_label.pack(pady=5)
-    back_button = ctk.CTkButton(root, text="Πίσω", command=show_main_menu)
-    back_button.pack(pady=20)
+
+# def show_sorted_activities_frame(username):
+#     clear_window()
+#     title_label = ctk.CTkLabel(root, text="Οι δραστηριότητες ταξινομίθηκας κατα συμαντικότητα", font=("Arial", 20))
+#     title_label.pack(pady=20)
+#     user_activities = [a for a in activities if a["username"] == username]
+#     if not user_activities:
+#         no_tasks_label = ctk.CTkLabel(root, text="Δεν βρέθηκαν δραστηριότητες.")
+#         no_tasks_label.pack(pady=10)
+#     else:
+#         sorted_activities = sorted(user_activities, key=lambda x: x["Σημαντικότητα"], reverse=True)
+#         for task in sorted_activities:
+#             task_str = f"{task['Δραστηριότητα']} - Duration: {task['Διάρκεια']} hours, Importance: {task['Σημαντικότητα']}, Type: {task['Τύπος']}"
+#             task_label = ctk.CTkLabel(root, text=task_str)
+#             task_label.pack(pady=5)
+#     back_button = ctk.CTkButton(root, text="Πίσω", command=show_main_menu)
+#     back_button.pack(pady=20)
 
 def show_edit_task_frame():
     clear_window()
