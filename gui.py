@@ -115,7 +115,6 @@ def show_main_menu():
         ("Προσθήκη δραστηριότητας", show_add_task_frame),
         ("Επεξεργασία δραστηριότητας", show_edit_task_frame),
         ("Διαγραφή δραστηριότητας", show_delete_task_frame),
-        ("Ταξινόμιση κατά σημαντικότητα", lambda: show_sorted_activities_frame(current_user)),
         ("Εμφάνιση δραστηριοτήτων", show_all_tasks_frame),
         ("Μέσος χρόνος δραστηριοτήτων", show_average_time_frame),
         ("Διάγραμμα Πίτας", show_pie_chart_frame),
@@ -168,12 +167,6 @@ def show_manage_free_time_frame():
     back_button.pack(pady=10)
 
 def show_add_task_frame():
-    user = [u for u in users if u["username"] == current_user][0]
-    if (user["user_total_free_hours"] == 0):
-        clear_window()
-        show_manage_free_time_frame()
-        return # Σταματάει εδώ αν δεν έχει ελεύθερες ώρες
-  
     clear_window()
     title_label = ctk.CTkLabel(root, text="Προσθήκη νέας δραστηριότητας", font=("Arial", 20))
     title_label.pack(pady=20)
