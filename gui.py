@@ -373,7 +373,7 @@ def show_edit_task_frame():
     ctk.CTkButton(root, text="Φόρτωση δραστηριότητας", command=load_task_details).pack(pady=10)
     ctk.CTkLabel(root, text="Όνομα δραστηριότητας:").pack(pady=5)
     name_entry.pack()
-    ctk.CTkLabel(root, text="Διάρκεια (ώρες):").pack(pady=5)
+    ctk.CTkLabel(root, text="Διάρκεια (Ώρες):").pack(pady=5)
     duration_entry.pack()
     ctk.CTkLabel(root, text="Συμαντικότητα (1-10):").pack(pady=5)
     importance_entry.pack()
