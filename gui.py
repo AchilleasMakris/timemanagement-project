@@ -12,7 +12,7 @@ ctk.set_default_color_theme("blue")
 # Initialize the main window
 root = ctk.CTk()
 root.title("Διαχείριση Ελεύθερου Χρόνου")
-root.geometry("800x600")
+root.geometry("1000x600")
 
 current_user = None  # Track the currently logged-in user
 backup_user_free_hours = 0
@@ -314,23 +314,6 @@ def show_all_tasks_frame():
     back_button.pack(pady=20)
 
 
-# def show_sorted_activities_frame(username):
-#     clear_window()
-#     title_label = ctk.CTkLabel(root, text="Οι δραστηριότητες ταξινομίθηκας κατα συμαντικότητα", font=("Arial", 20))
-#     title_label.pack(pady=20)
-#     user_activities = [a for a in activities if a["username"] == username]
-#     if not user_activities:
-#         no_tasks_label = ctk.CTkLabel(root, text="Δεν βρέθηκαν δραστηριότητες.")
-#         no_tasks_label.pack(pady=10)
-#     else:
-#         sorted_activities = sorted(user_activities, key=lambda x: x["Σημαντικότητα"], reverse=True)
-#         for task in sorted_activities:
-#             task_str = f"{task['Δραστηριότητα']} - Duration: {task['Διάρκεια']} hours, Importance: {task['Σημαντικότητα']}, Type: {task['Τύπος']}"
-#             task_label = ctk.CTkLabel(root, text=task_str)
-#             task_label.pack(pady=5)
-#     back_button = ctk.CTkButton(root, text="Πίσω", command=show_main_menu)
-#     back_button.pack(pady=20)
-
 def show_edit_task_frame():
     clear_window()
     title_label = ctk.CTkLabel(root, text="Επεξεργασία Δραστηριότηας", font=("Arial", 20))
@@ -480,6 +463,7 @@ def show_pie_chart_frame():
         ax.set_title("Κατανομή Χρόνου")
 
         # Ενσωμάτωση του figure στο Tkinter
+        # Embed the Matplotlib figure into the Tkinter GUI
         canvas = FigureCanvasTkAgg(fig, master=root)
         canvas.draw()
         canvas.get_tk_widget().pack(fill="both", expand=True)
@@ -505,10 +489,11 @@ def show_bar_chart_frame():
         bars = ax.bar(names, hours, color=colors[:len(names)])
         for bar in bars:
             yval = bar.get_height()
-            ax.text(bar.get_x() + bar.get_width()/2, yval + 0.5, f"{yval} ώρες", ha='center', va='bottom')
-        ax.axhline(y=user_total_free_hours, color='r', linestyle='--', label='Ελεύθερος Χρόνος')
+            ax.text(bar.get_x() + bar.get_width()/2, yval, f"{yval} ώρες", ha='center', va='bottom')
         if len(names) > 0:
-            ax.text(len(names)-0.5, user_total_free_hours + 0.5, f"Ελεύθερος Χρόνος: {user_total_free_hours} ώρες", color='r', va='bottom')
+            if(user_total_free_hours > 0):
+                ax.text(len(names)-0.2, user_total_free_hours + 0.5, f"Ελεύθερος Χρόνος: {user_total_free_hours} ώρες", color='r', va='bottom')
+                ax.axhline(y=user_total_free_hours, color='r', linestyle='--', label='Ελεύθερος Χρόνος')
         ax.legend()
         ax.set_xlabel("Δραστηριότητες")
         ax.set_ylabel("Ώρες")

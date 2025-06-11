@@ -318,8 +318,8 @@ def modify_activity(connected_user, onoma, activities, users, new_onoma=None, ne
                 for user in users:
                     if user["username"] == connected_user:
                         user_total_free_hours = user["user_total_free_hours"] + old_diarkeia - new_diarkeia
-                        if user_total_free_hours < 0:
-                            return False, "Δεν υπάρχει αρκετός ελεύθερος χρόνος για αυτή την αλλαγή."
+                        # if user_total_free_hours < 0:
+                        #     return False, "Δεν υπάρχει αρκετός ελεύθερος χρόνος για αυτή την αλλαγή."
                         user["user_total_free_hours"] = user_total_free_hours
                         break
                 activity["Διάρκεια"] = new_diarkeia
