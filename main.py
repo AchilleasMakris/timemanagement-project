@@ -541,7 +541,7 @@ def delete_activity(connected_user, onoma, activities, users):
                     break
             save_activities_to_csv()  # Αποθήκευση αλλαγών
             save_user_to_csv()
-            return True, "Δραστηριότητα διαγράφηκε επιτυχώς."
+            return True, "Η δραστηριότητα διαγράφηκε επιτυχώς."
     return False, "Η δραστηριότητα δεν βρέθηκε."
 
 def set_free_time(connected_user, user_total_free_hours, activities, users):
