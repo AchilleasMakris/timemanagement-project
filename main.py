@@ -58,8 +58,8 @@ def load_users_from_csv(filename="users.csv"):
                 users.append({
                     "username": row['username'],
                     "password": row['password'],
-                    "user_total_free_hours": float(row.get('user_total_free_hours')),  # Μετατροπή σε float
-                    "backup_user_free_hours": float(row.get('backup_user_free_hours'))  # Μετατροπή σε float
+                    "user_total_free_hours": float(row.get('user_total_free_hours', 0)),  # Μετατροπή σε float
+                    "backup_user_free_hours": float(row.get('backup_user_free_hours', 0))  # Προεπιλογή 0 αν είναι None
                 })
     except FileNotFoundError:
         pass  # Το αρχείο θα δημιουργηθεί την πρώτη φορά που θα αποθηκευτεί χρήστης
@@ -688,7 +688,7 @@ def plot_bar_chart(user_activities, user_total_free_hours):
     
     Note:
         - Δημιουργεί ραβδόγραμμα με τις ώρες κάθε δραστηριότητας
-        - Προσθέτει τιμές πάνω από τις μπάρες
+        - Προσθέτει τιμές πάνω από τις μπαρες
         - Προσθέτει οριζόντια γραμμή που δείχνει τον διαθέσιμο ελεύθερο χρόνο
     """
     if not user_activities:
