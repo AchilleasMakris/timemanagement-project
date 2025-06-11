@@ -47,10 +47,10 @@
 ### Μέθοδος 1: Εκτέλεση του εκτελέσιμου αρχείου (Προτεινόμενη μέθοδος)
 
 1. **Λήψη της τελευταίας έκδοσης:**
-   - Κατεβάστε το αρχείο `TimeManagement.exe` από την [σελίδα Releases](https://github.com/AchilleasMakris/timemanagement-project/releases)
+   - Κατεβάστε το αρχείο `Time-Management.exe` από την [σελίδα Releases](https://github.com/AchilleasMakris/timemanagement-project/releases)
 
 2. **Εκτέλεση της εφαρμογής:**
-   - Απλά εκτελέστε το αρχείο `TimeManagement.exe` με διπλό κλικ
+   - Απλά εκτελέστε το αρχείο `Time-Management.exe` με διπλό κλικ
    - Δεν απαιτείται εγκατάσταση Python ή άλλων βιβλιοθηκών
 
 3. **Σημειώσεις για την εκτελέσιμη έκδοση:**
