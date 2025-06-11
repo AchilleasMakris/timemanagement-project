@@ -448,8 +448,10 @@ def show_pie_chart_frame():
     title_label.pack(pady=20)
 
     user_tasks = [task for task in activities if task["username"] == current_user]
-    user = next(u for u in users if u["username"] == current_user)
-    user_total_free_hours = user["user_total_free_hours"]
+    for user in users:
+        if user["username"] == current_user:
+            user_total_free_hours = user["user_total_free_hours"]
+            break
 
     if user_tasks or user_total_free_hours > 0:
         # Δημιουργία figure για το γράφημα
@@ -459,7 +461,16 @@ def show_pie_chart_frame():
         if user_total_free_hours > 0:
             labels.append("Ελεύθερος χρόνος")
             sizes.append(user_total_free_hours)
-        ax.pie(sizes, labels=labels, autopct='%1.1f%%')
+
+
+          # Προσαρμοσμένη συνάρτηση για εμφάνιση ωρών αντί για ποσοστά
+        def autopct_format(pct):
+            total = sum(sizes)
+            val = int(round(pct*total/100.0))
+            return f'{val} ώρες'
+        
+
+        ax.pie(sizes, labels=labels, autopct=autopct_format)
         ax.set_title("Κατανομή Χρόνου")
 
         # Ενσωμάτωση του figure στο Tkinter
@@ -477,8 +488,10 @@ def show_bar_chart_frame():
     title_label.pack(pady=20)
 
     user_tasks = [task for task in activities if task["username"] == current_user]
-    user = next(u for u in users if u["username"] == current_user)
-    user_total_free_hours = user["user_total_free_hours"]
+    for user in users:
+        if user["username"] == current_user:
+            user_total_free_hours = user["user_total_free_hours"]
+            break
 
     if user_tasks:
         # Δημιουργία figure για το γράφημα
