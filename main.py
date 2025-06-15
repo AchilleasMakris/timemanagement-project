@@ -18,7 +18,7 @@ week_hours = 168                # Συνολικές ώρες της εβδομ�
 total_ypoxrewseis_hours = 0     # Μετρητής για τις συνολικές ώρες υποχρεώσεων του χρήστη
 total_hobby_hours = 0           # Μετρητής για τις συνολικές ώρες των Χόμπι του χρήστη
 total_activity_hours = 0        # Μετρητής για τις συνολικές ώρες ΌΛΩΝ των δραστηριοτήτων του χρήστη
-terminate = False               # Σημαία για έλεγχο τερματισμού του προγράμματος
+#terminate = False               # Σημαία για έλεγχο τερματισμού του προγράμματος
 
 #--------------------------------------------------------- Αποθήκευση αρχείων --------------------------------------------------------------------
 
@@ -271,105 +271,105 @@ def get_user_total_free_hours(connected_user, users):
                 return user_total_free_hours  # Επιστροφή του έγκυρου ελεύθερου χρόνου
 
 # Συνάρτηση εισαγωγής ονόματος δραστηριότητας ή υποχρέωσης
-def name():
-    """
-    Εισάγει και επικυρώνει το όνομα μιας δραστηριότητας.
+# def name():
+#     """
+#     Εισάγει και επικυρώνει το όνομα μιας δραστηριότητας.
     
-    Returns:
-        str: Το έγκυρο όνομα της δραστηριότητας.
+#     Returns:
+#         str: Το έγκυρο όνομα της δραστηριότητας.
     
-    Note:
-        - Ελέγχει αν το όνομα είναι κενό ή αν δεν περιέχει κανέναν αλφαβητικό χαρακτήρα
-        - Αφαιρεί τα περιττά κενά με την strip() πριν τον έλεγχο
-    """
-    # Εισαγωγή ονόματος, αφαιρώ τα κενά space πρίν και μετά το όνομα. 
-    onoma = input("Δώστε το όνομα της δραστηριότητας: ").strip()
+#     Note:
+#         - Ελέγχει αν το όνομα είναι κενό ή αν δεν περιέχει κανέναν αλφαβητικό χαρακτήρα
+#         - Αφαιρεί τα περιττά κενά με την strip() πριν τον έλεγχο
+#     """
+#     # Εισαγωγή ονόματος, αφαιρώ τα κενά space πρίν και μετά το όνομα. 
+#     onoma = input("Δώστε το όνομα της δραστηριότητας: ").strip()
             
-    """"
-        Έλεγχος ονόματος, αν δωθεί το κενό τότε το διαγράφω με την strip επομένως onoma = False και μπαίνω στην επανάληψη
-        ή αν κανένα απο τα στοιχεία του ονόματος δεν είναι χαρακτήρας.
-    """
-    while not onoma or not any(char.isalpha() for char in onoma):
-        onoma = input("Το όνομα της δραστηριότητας δεν μπορεί να είναι κενό ή αριθμός, παρακαλώ επανεισάγετε το όνομα: ").strip()
-    return onoma
+#     """"
+#         Έλεγχος ονόματος, αν δωθεί το κενό τότε το διαγράφω με την strip επομένως onoma = False και μπαίνω στην επανάληψη
+#         ή αν κανένα απο τα στοιχεία του ονόματος δεν είναι χαρακτήρας.
+#     """
+#     while not onoma or not any(char.isalpha() for char in onoma):
+#         onoma = input("Το όνομα της δραστηριότητας δεν μπορεί να είναι κενό ή αριθμός, παρακαλώ επανεισάγετε το όνομα: ").strip()
+#     return onoma
 
 # Συνάρτηση εισαγωγής διάρκειας δραστηριότητας ή υποχρέωσης
-def duration(user_total_free_hours):
-    """
-    Εισάγει και επικυρώνει τη διάρκεια μιας δραστηριότητας.
+# def duration(user_total_free_hours):
+#     """
+#     Εισάγει και επικυρώνει τη διάρκεια μιας δραστηριότητας.
     
-    Args:
-        user_total_free_hours (float): Ο διαθέσιμος ελεύθερος χρόνος του χρήστη.
+#     Args:
+#         user_total_free_hours (float): Ο διαθέσιμος ελεύθερος χρόνος του χρήστη.
     
-    Returns:
-        tuple: (diarkeia, new_user_total_free_hours) - Η διάρκεια της δραστηριότητας και
-               ο ενημερωμένος ελεύθερος χρόνος.
+#     Returns:
+#         tuple: (diarkeia, new_user_total_free_hours) - Η διάρκεια της δραστηριότητας και
+#                ο ενημερωμένος ελεύθερος χρόνος.
     
-    Note:
-        - Ελέγχει αν η διάρκεια είναι θετική και μικρότερη από τον διαθέσιμο χρόνο
-        - Χειρίζεται σφάλματα μετατροπής τιμών (ValueError)
-        - Επιτρέπει στον χρήστη να επαναπροσδιορίσει τον συνολικό ελεύθερο χρόνο του
-    """
+#     Note:
+#         - Ελέγχει αν η διάρκεια είναι θετική και μικρότερη από τον διαθέσιμο χρόνο
+#         - Χειρίζεται σφάλματα μετατροπής τιμών (ValueError)
+#         - Επιτρέπει στον χρήστη να επαναπροσδιορίσει τον συνολικό ελεύθερο χρόνο του
+#     """
     
-    # Εισαγωγή διάρκειας με έλεγχο ορθότητας (Δεν μπορεί να υπερβαίνει τον συνολικό ελεύθερο χρόνο, τις 168 ώρες της εβδομάδας και να είναι αρνητική ή χαρακτήρας).
-    while True:
-        try:
-            diarkeia = input("\nΔώστε την διάρκεια της δραστηριότητας σε ώρες: ").strip()
-            diarkeia = float(diarkeia)  # Μετατροπή σε αριθμό
-            if diarkeia and 0 < diarkeia <= user_total_free_hours:
-                user_total_free_hours -= diarkeia  # Αφαίρεση της διάρκειας από τον ελεύθερο χρόνο
-                # Επιστρέφει την διάρκεια και τον ενημερωμένο ελεύθερο χρόνο
-                return diarkeia, user_total_free_hours
-            else:
-                if diarkeia + user_total_free_hours > week_hours:
-                    print(f"\nΗ διάρκεια πρέπει να είναι θετικός αριθμός και δεν μπορεί να ξεπερνάει τις {user_total_free_hours} διαθέσιμες ώρες ή τις 168 ώρες της εβδομάδας.")
-        except ValueError:
-            print("\nΜή έγκυρη είσοδος, παρακαλώ εισάγετε έναν αριθμό ωρών.")
+#     # Εισαγωγή διάρκειας με έλεγχο ορθότητας (Δεν μπορεί να υπερβαίνει τον συνολικό ελεύθερο χρόνο, τις 168 ώρες της εβδομάδας και να είναι αρνητική ή χαρακτήρας).
+#     while True:
+#         try:
+#             diarkeia = input("\nΔώστε την διάρκεια της δραστηριότητας σε ώρες: ").strip()
+#             diarkeia = float(diarkeia)  # Μετατροπή σε αριθμό
+#             if diarkeia and 0 < diarkeia <= user_total_free_hours:
+#                 user_total_free_hours -= diarkeia  # Αφαίρεση της διάρκειας από τον ελεύθερο χρόνο
+#                 # Επιστρέφει την διάρκεια και τον ενημερωμένο ελεύθερο χρόνο
+#                 return diarkeia, user_total_free_hours
+#             else:
+#                 if diarkeia + user_total_free_hours > week_hours:
+#                     print(f"\nΗ διάρκεια πρέπει να είναι θετικός αριθμός και δεν μπορεί να ξεπερνάει τις {user_total_free_hours} διαθέσιμες ώρες ή τις 168 ώρες της εβδομάδας.")
+#         except ValueError:
+#             print("\nΜή έγκυρη είσοδος, παρακαλώ εισάγετε έναν αριθμό ωρών.")
         
-        # Σε περίπτωση σφάλματος, επιτρέπουμε στον χρήστη να επαναπροσδιορίσει τον συνολικό ελεύθερο χρόνο
-        try:
-            user_total_free_hours = input("Παρακαλώ εισάγετε τις συνολικές ώρες που έχετε διαθέσιμες για αυτήν την εβδομάδα: ").strip()
-            user_total_free_hours = float(user_total_free_hours)
+#         # Σε περίπτωση σφάλματος, επιτρέπουμε στον χρήστη να επαναπροσδιορίσει τον συνολικό ελεύθερο χρόνο
+#         try:
+#             user_total_free_hours = input("Παρακαλώ εισάγετε τις συνολικές ώρες που έχετε διαθέσιμες για αυτήν την εβδομάδα: ").strip()
+#             user_total_free_hours = float(user_total_free_hours)
             
-            if 0 <= user_total_free_hours <= 168 and user_total_free_hours > total_activity_hours:
-                user_total_free_hours -= total_activity_hours  # Αφαίρεση του χρόνου που ήδη χρησιμοποιείται
-                if activities:
-                    print(f"\nΑφαιρέθηκαν {total_activity_hours} ώρες από τον νέο συνολικό σας χρόνο για τις ήδη υπάρχουσες δραστηριότητές σας.")
-                    print(f"\nΟ νέος συνολικός ελεύθερος χρόνος σας είναι: {user_total_free_hours}.")
+#             if 0 <= user_total_free_hours <= 168 and user_total_free_hours > total_activity_hours:
+#                 user_total_free_hours -= total_activity_hours  # Αφαίρεση του χρόνου που ήδη χρησιμοποιείται
+#                 if activities:
+#                     print(f"\nΑφαιρέθηκαν {total_activity_hours} ώρες από τον νέο συνολικό σας χρόνο για τις ήδη υπάρχουσες δραστηριότητές σας.")
+#                     print(f"\nΟ νέος συνολικός ελεύθερος χρόνος σας είναι: {user_total_free_hours}.")
 
-                return user_total_free_hours
-            else:
-                if total_activity_hours > user_total_free_hours:
-                    print(f"\nΕισάγετε παραπάνω ώρες! Απαιτούνται {total_activity_hours} ώρες για τις ήδη υπάρχουσες δραστηριότητές σας.")
-                elif total_activity_hours == user_total_free_hours:
-                    print(f"Εισάγετε παραπάνω ώρες. Απαιτούνται ήδη {user_total_free_hours} για τις υπάρχουσες δραστηριότητες.")
-                else:
-                    print("Οι συνολικές διαθέσιμές ώρες δεν μπορούν να είναι αρνητικός αριθμός ή περισσότερες από τις 168 ώρες της εβδομάδας.")
+#                 return user_total_free_hours
+#             else:
+#                 if total_activity_hours > user_total_free_hours:
+#                     print(f"\nΕισάγετε παραπάνω ώρες! Απαιτούνται {total_activity_hours} ώρες για τις ήδη υπάρχουσες δραστηριότητές σας.")
+#                 elif total_activity_hours == user_total_free_hours:
+#                     print(f"Εισάγετε παραπάνω ώρες. Απαιτούνται ήδη {user_total_free_hours} για τις υπάρχουσες δραστηριότητες.")
+#                 else:
+#                     print("Οι συνολικές διαθέσιμές ώρες δεν μπορούν να είναι αρνητικός αριθμός ή περισσότερες από τις 168 ώρες της εβδομάδας.")
                 
-        except ValueError:
-            print ("Μή έγκυρη είσοδος. Παρακαλώ εισάγετε τον αριθμό των διαθέσιμων ωρών.")
+#         except ValueError:
+#             print ("Μή έγκυρη είσοδος. Παρακαλώ εισάγετε τον αριθμό των διαθέσιμων ωρών.")
 # Συνάρτηση εισαγωγής βαθμού σημαντικότητας
-def importance():
-    """
-    Εισάγει και επικυρώνει τον βαθμό σημαντικότητας μιας δραστηριότητας.
+# def importance():
+#     """
+#     Εισάγει και επικυρώνει τον βαθμό σημαντικότητας μιας δραστηριότητας.
     
-    Returns:
-        int: Ο έγκυρος βαθμός σημαντικότητας (1-10).
+#     Returns:
+#         int: Ο έγκυρος βαθμός σημαντικότητας (1-10).
     
-    Note:
-        - Ελέγχει αν η τιμή είναι ακέραιος μεταξύ 1 και 10
-        - Χειρίζεται σφάλματα μετατροπής τιμών (ValueError)
-    """
-    while True:
-        try:    
-            grade = input("Δώστε τον βαθμό σημαντικότητας (1-10): ").strip()
-            grade = int(grade)  # Μετατροπή σε ακέραιο
-            if grade and 1 <= grade <= 10:  # Έλεγχος αν είναι μεταξύ 1 και 10
-                return grade
-            else:
-                print("Παρακαλώ δώστε έναν βαθμό απο το 1 εώς το 10.")
-        except ValueError:
-            print("Μή έγκυρη τιμή.")
+#     Note:
+#         - Ελέγχει αν η τιμή είναι ακέραιος μεταξύ 1 και 10
+#         - Χειρίζεται σφάλματα μετατροπής τιμών (ValueError)
+#     """
+#     while True:
+#         try:    
+#             grade = input("Δώστε τον βαθμό σημαντικότητας (1-10): ").strip()
+#             grade = int(grade)  # Μετατροπή σε ακέραιο
+#             if grade and 1 <= grade <= 10:  # Έλεγχος αν είναι μεταξύ 1 και 10
+#                 return grade
+#             else:
+#                 print("Παρακαλώ δώστε έναν βαθμό απο το 1 εώς το 10.")
+#         except ValueError:
+#             print("Μή έγκυρη τιμή.")
 
 
 # Ταξινόμηση 
@@ -388,7 +388,11 @@ def taksinomisi(current_user):
         - Ταξινομεί πρώτα με βάση τον τύπο (Υποχρεώσεις πρώτα) και μετά κατά σημαντικότητα (φθίνουσα)
     """
     # Clear and rebuild user_activities list for the connected user
-    user_activities = [activity for activity in activities if activity["username"] == current_user]
+    user_activities = []
+
+    for activity in activities:
+        if activity["username"] == current_user:
+            user_activities.append(activity)
     
     # Sort by type first (Υποχρέωση first), then by importance
     # Η lambda δημιουργεί ένα tuple κριτηρίων ταξινόμησης (τύπος, αρνητική σημαντικότητα)
@@ -566,8 +570,8 @@ def set_free_time(connected_user, user_total_free_hours, activities, users):
     # Input validation: free time must be >0 and <=168
     if user_total_free_hours <= 0 or user_total_free_hours > 168:
         return False, "Ο συνολικός ελεύθερος χρόνος πρέπει να είναι μεγαλύτερος του 0 και μικρότερος ή ίσος με 168."
-    total_activity_hours = sum(task["Διάρκεια"] for task in activities if task["username"] == connected_user)
     
+    # total_activity_hours = sum(task["Διάρκεια"] for task in activities if task["username"] == connected_user)
     # Σχόλιο: Ο έλεγχος επαρκούς χρόνου είναι σχολιασμένος, επιτρέποντας στον χρήστη να ορίσει λιγότερες ώρες από αυτές που απαιτούνται
     # if user_total_free_hours < total_activity_hours:
     #     return False, f"Ο νέος χρόνος πρέπει να είναι τουλάχιστον {total_activity_hours} ώρες για τις υπάρχουσες δραστηριότητες."
@@ -580,160 +584,160 @@ def set_free_time(connected_user, user_total_free_hours, activities, users):
 
 
 # Εμφάνιση όλων των αποθηκευμένων δραστηριοτήτων
-def display_activities(user_activities):
-    """
-    Προβάλει τις αποθηκευμένες δραστηριότητες ή αν δεν υπάρχουν, ενημερώνει με κατάλληλο μήνυμα.
+# def display_activities(user_activities):
+#     """
+#     Προβάλει τις αποθηκευμένες δραστηριότητες ή αν δεν υπάρχουν, ενημερώνει με κατάλληλο μήνυμα.
     
-    Args:
-        user_activities (list): Η λίστα με τις δραστηριότητες του χρήστη.
-    """
-    if not user_activities:
-        print("\nΔεν βρέθηκαν δραστηριότητες.\n")
-    else:
-        print("\nΟι δραστηριότητες που έχετε να κάνετε αυτή την εβδομάδα είναι: \n")
-        for drastiriotita in user_activities:
-            print (f"{drastiriotita['Δραστηριότητα']} : Διάρκεια: {drastiriotita['Διάρκεια']} ώρες | Βαθμός σημαντικότητας: {drastiriotita['Σημαντικότητα']} | Τύπος: {drastiriotita['Τύπος']}")
+#     Args:
+#         user_activities (list): Η λίστα με τις δραστηριότητες του χρήστη.
+#     """
+#     if not user_activities:
+#         print("\nΔεν βρέθηκαν δραστηριότητες.\n")
+#     else:
+#         print("\nΟι δραστηριότητες που έχετε να κάνετε αυτή την εβδομάδα είναι: \n")
+#         for drastiriotita in user_activities:
+#             print (f"{drastiriotita['Δραστηριότητα']} : Διάρκεια: {drastiriotita['Διάρκεια']} ώρες | Βαθμός σημαντικότητας: {drastiriotita['Σημαντικότητα']} | Τύπος: {drastiriotita['Τύπος']}")
 
 # Εμφάνιση του συνολικού ελεύθερου χρόνου
-def display_FreeTime(user_total_free_hours,user_activities):
-    """
-    Προβάλει τον διαθέσιμο ελεύθερο χρόνο
+# def display_FreeTime(user_total_free_hours,user_activities):
+#     """
+#     Προβάλει τον διαθέσιμο ελεύθερο χρόνο
     
-    Args:
-        user_total_free_hours (float): Ο διαθέσιμος ελεύθερος χρόνος του χρήστη.
-        user_activities (list): Η λίστα με τις δραστηριότητες του χρήστη.
+#     Args:
+#         user_total_free_hours (float): Ο διαθέσιμος ελεύθερος χρόνος του χρήστη.
+#         user_activities (list): Η λίστα με τις δραστηριότητες του χρήστη.
     
-    Note:
-        - Εμφανίζει διαφορετικά μηνύματα ανάλογα με την κατάσταση του ελεύθερου χρόνου
-          και την ύπαρξη δραστηριοτήτων
-    """
+#     Note:
+#         - Εμφανίζει διαφορετικά μηνύματα ανάλογα με την κατάσταση του ελεύθερου χρόνου
+#           και την ύπαρξη δραστηριοτήτων
+#     """
     
-    if user_total_free_hours > 0:
-        print("\nΟ συνολικός ελεύθερος χρόνος σας για αυτή την εβδομάδα είναι: ", user_total_free_hours, "ώρες.")
-    else:
-        if not user_activities:
-            print("\nΔεν έχετε εισάγει τον διαθέσιμο ελεύθερο χρόνο σας. Παρακαλώ πατήστε το 6 για προσθήκη ελεύθερου χρόνου.")
-        else:
-            print("\nΔεν έχετε διαθέσιμό ελεύθερο χρόνο, παρακαλώ τροποποιήστε ή διαγράψτε κάποια δραστηριότητα για να ελευθερώσετε χρόνο ή πατήστε 6 για να προσθέσετε ελεύθερο χρόνο")
+#     if user_total_free_hours > 0:
+#         print("\nΟ συνολικός ελεύθερος χρόνος σας για αυτή την εβδομάδα είναι: ", user_total_free_hours, "ώρες.")
+#     else:
+#         if not user_activities:
+#             print("\nΔεν έχετε εισάγει τον διαθέσιμο ελεύθερο χρόνο σας. Παρακαλώ πατήστε το 6 για προσθήκη ελεύθερου χρόνου.")
+#         else:
+#             print("\nΔεν έχετε διαθέσιμό ελεύθερο χρόνο, παρακαλώ τροποποιήστε ή διαγράψτε κάποια δραστηριότητα για να ελευθερώσετε χρόνο ή πατήστε 6 για να προσθέσετε ελεύθερο χρόνο")
 
 # Ενημέρωση της λίστας users
-def update_users_list(connected_user, user_total_free_hours):
-    """
-    Ενημερώνει τον ελεύθερο χρόνο του συγκεκριμένου χρήστη στη λίστα users.
+# def update_users_list(connected_user, user_total_free_hours):
+#     """
+#     Ενημερώνει τον ελεύθερο χρόνο του συγκεκριμένου χρήστη στη λίστα users.
     
-    Args:
-        connected_user (str): Το όνομα χρήστη του συνδεδεμένου χρήστη.
-        user_total_free_hours (float): Ο νέος διαθέσιμος ελεύθερος χρόνος.
-    """
-    for user in users:
-        if connected_user == user["username"]:
-            user["user_total_free_hours"] = user_total_free_hours
+#     Args:
+#         connected_user (str): Το όνομα χρήστη του συνδεδεμένου χρήστη.
+#         user_total_free_hours (float): Ο νέος διαθέσιμος ελεύθερος χρόνος.
+#     """
+#     for user in users:
+#         if connected_user == user["username"]:
+#             user["user_total_free_hours"] = user_total_free_hours
 
-def plot_pie_chart(user_activities, user_total_free_hours):
-    """
-    Δημιουργεί ένα γράφημα πίτας που δείχνει την κατανομή του χρόνου.
+# def plot_pie_chart(user_activities, user_total_free_hours):
+#     """
+#     Δημιουργεί ένα γράφημα πίτας που δείχνει την κατανομή του χρόνου.
 
-    Args:
-        user_activities (list): Λίστα με τις δραστηριότητες του χρήστη.
-        user_total_free_hours (float): Ο εναπομείνων ελεύθερος χρόνος του χρήστη.
+#     Args:
+#         user_activities (list): Λίστα με τις δραστηριότητες του χρήστη.
+#         user_total_free_hours (float): Ο εναπομείνων ελεύθερος χρόνος του χρήστη.
 
-    Returns:
-        None
+#     Returns:
+#         None
     
-    Note:
-        - Χρησιμοποιεί προσαρμοσμένη συνάρτηση autopct_format για την εμφάνιση ωρών αντί ποσοστών
-        - Προσθέτει τον ελεύθερο χρόνο στο γράφημα αν είναι μεγαλύτερος του 0
-    """
-    # Έλεγχος αν υπάρχουν δεδομένα για απεικόνιση
-    if not user_activities and user_total_free_hours <= 0:
-        print("Δεν υπάρχουν δραστηριότητες ή ελεύθερος χρόνος για απεικόνιση.")
-        return
+#     Note:
+#         - Χρησιμοποιεί προσαρμοσμένη συνάρτηση autopct_format για την εμφάνιση ωρών αντί ποσοστών
+#         - Προσθέτει τον ελεύθερο χρόνο στο γράφημα αν είναι μεγαλύτερος του 0
+#     """
+#     # Έλεγχος αν υπάρχουν δεδομένα για απεικόνιση
+#     if not user_activities and user_total_free_hours <= 0:
+#         print("Δεν υπάρχουν δραστηριότητες ή ελεύθερος χρόνος για απεικόνιση.")
+#         return
     
-    # Δημιουργία λιστών για ετικέτες και μεγέθη
-    labels = [activity['Δραστηριότητα'] for activity in user_activities]
-    sizes = [float(activity['Διάρκεια']) for activity in user_activities]
+#     # Δημιουργία λιστών για ετικέτες και μεγέθη
+#     labels = [activity['Δραστηριότητα'] for activity in user_activities]
+#     sizes = [float(activity['Διάρκεια']) for activity in user_activities]
     
-    # Προσθήκη ελεύθερου χρόνου αν είναι μεγαλύτερος από 0
-    if user_total_free_hours > 0:
-        labels.append("Ελεύθερος χρόνος")
-        sizes.append(user_total_free_hours)
+#     # Προσθήκη ελεύθερου χρόνου αν είναι μεγαλύτερος από 0
+#     if user_total_free_hours > 0:
+#         labels.append("Ελεύθερος χρόνος")
+#         sizes.append(user_total_free_hours)
     
-#     Υπολογίζει το άθροισμα όλων των ωρών: sum(allvals)
-#     Μετατρέπει το ποσοστό σε δεκαδικό αριθμό: pct / 100.
-#     Πολλαπλασιάζει για να βρει τις πραγματικές ώρες: pct / 100. * sum(allvals)
-#     Μετατρέπει το αποτέλεσμα σε ακέραιο: int(pct / 100. * sum(allvals))
-#     Τέλος, επιστρέφει μια συμβολοσειρά με το αποτέλεσμα: f"{absolute} ώρες"
-#     Για παράδειγμα, αν το γράφημα πίτας δείχνει μια δραστηριότητα που καταλαμβάνει το 30% του συνολικού χρόνου και το συνολικό άθροισμα των ωρών είναι 100, η συνάρτηση θα υπολογίσει: 30 / 100 * 100 = 30 και θα εμφανίσει "30 ώρες" σε αυτό το κομμάτι της πίτας.
+# #     Υπολογίζει το άθροισμα όλων των ωρών: sum(allvals)
+# #     Μετατρέπει το ποσοστό σε δεκαδικό αριθμό: pct / 100.
+# #     Πολλαπλασιάζει για να βρει τις πραγματικές ώρες: pct / 100. * sum(allvals)
+# #     Μετατρέπει το αποτέλεσμα σε ακέραιο: int(pct / 100. * sum(allvals))
+# #     Τέλος, επιστρέφει μια συμβολοσειρά με το αποτέλεσμα: f"{absolute} ώρες"
+# #     Για παράδειγμα, αν το γράφημα πίτας δείχνει μια δραστηριότητα που καταλαμβάνει το 30% του συνολικού χρόνου και το συνολικό άθροισμα των ωρών είναι 100, η συνάρτηση θα υπολογίσει: 30 / 100 * 100 = 30 και θα εμφανίσει "30 ώρες" σε αυτό το κομμάτι της πίτας.
 
-    # Προσαρμοσμένη συνάρτηση για εμφάνιση ωρών αντί ποσοστού.
-    def autopct_format(pct, allvals):
-        absolute = int(pct / 100. * sum(allvals))  # Μετατροπή ποσοστού σε ώρες
-        return f"{absolute} ώρες"
+#     # Προσαρμοσμένη συνάρτηση για εμφάνιση ωρών αντί ποσοστού.
+#     def autopct_format(pct, allvals):
+#         absolute = int(pct / 100. * sum(allvals))  # Μετατροπή ποσοστού σε ώρες
+#         return f"{absolute} ώρες"
     
-    # Δημιουργία γράφηματος πίτας
-    plt.pie(sizes, labels=labels, autopct=lambda pct: autopct_format(pct, sizes))
-    plt.title("Κατανομή Χρόνου")
-    plt.show()
+#     # Δημιουργία γράφηματος πίτας
+#     plt.pie(sizes, labels=labels, autopct=lambda pct: autopct_format(pct, sizes))
+#     plt.title("Κατανομή Χρόνου")
+#     plt.show()
 
-def plot_bar_chart(user_activities, user_total_free_hours):
-    """
-    Δημιουργεί ένα γράφημα στηλών που δείχνει τις ώρες ανά δραστηριότητα.
+# def plot_bar_chart(user_activities, user_total_free_hours):
+#     """
+#     Δημιουργεί ένα γράφημα στηλών που δείχνει τις ώρες ανά δραστηριότητα.
 
-    Args:
-        user_activities (list): Λίστα με τις δραστηριότητες του χρήστη.
-        user_total_free_hours (float): Ο συνολικός ελεύθερος χρόνος του χρήστη.
+#     Args:
+#         user_activities (list): Λίστα με τις δραστηριότητες του χρήστη.
+#         user_total_free_hours (float): Ο συνολικός ελεύθερος χρόνος του χρήστη.
 
-    Returns:
-        None
+#     Returns:
+#         None
     
-    Note:
-        - Δημιουργεί ραβδόγραμμα με τις ώρες κάθε δραστηριότητας
-        - Προσθέτει τιμές πάνω από τις μπαρες
-        - Προσθέτει οριζόντια γραμμή που δείχνει τον διαθέσιμο ελεύθερο χρόνο
-    """
-    if not user_activities:
-        print("Δεν υπάρχουν δραστηριότητες για απεικόνιση.")
-        return
+#     Note:
+#         - Δημιουργεί ραβδόγραμμα με τις ώρες κάθε δραστηριότητας
+#         - Προσθέτει τιμές πάνω από τις μπαρες
+#         - Προσθέτει οριζόντια γραμμή που δείχνει τον διαθέσιμο ελεύθερο χρόνο
+#     """
+#     if not user_activities:
+#         print("Δεν υπάρχουν δραστηριότητες για απεικόνιση.")
+#         return
     
-    # Εξαγωγή ονομάτων και ωρών
-    names = [activity['Δραστηριότητα'] for activity in user_activities]
-    hours = [float(activity['Διάρκεια']) for activity in user_activities]
+#     # Εξαγωγή ονομάτων και ωρών
+#     names = [activity['Δραστηριότητα'] for activity in user_activities]
+#     hours = [float(activity['Διάρκεια']) for activity in user_activities]
     
-    # Ορισμός παλέτας χρωμάτων
-    colors = plt.get_cmap('tab10').colors  # Χρήση της προκαθορισμένης παλέτας tab10
+#     # Ορισμός παλέτας χρωμάτων
+#     colors = plt.get_cmap('tab10').colors  # Χρήση της προκαθορισμένης παλέτας tab10
     
-    # Δημιουργία μπαρών
-    bars = plt.bar(names, hours, color=colors[:len(names)])
+#     # Δημιουργία μπαρών
+#     bars = plt.bar(names, hours, color=colors[:len(names)])
     
-    # Προσθήκη τιμών πάνω από τις μπάρες
-    for bar in bars:
-        yval = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2, yval + 0.5, f"{yval} ώρες", ha='center', va='bottom')
+#     # Προσθήκη τιμών πάνω από τις μπάρες
+#     for bar in bars:
+#         yval = bar.get_height()
+#         plt.text(bar.get_x() + bar.get_width()/2, yval + 0.5, f"{yval} ώρες", ha='center', va='bottom')
     
-    # Προσθήκη οριζόντιας γραμμής για τον ελεύθερο χρόνο
-    plt.axhline(y=user_total_free_hours, color='r', linestyle='--', label='Ελεύθερος Χρόνος')
+#     # Προσθήκη οριζόντιας γραμμής για τον ελεύθερο χρόνο
+#     plt.axhline(y=user_total_free_hours, color='r', linestyle='--', label='Ελεύθερος Χρόνος')
     
-    # Προσθήκη κειμένου για τον ελεύθερο χρόνο
-    if len(names) > 0:
-        plt.text(len(names)-0.5, user_total_free_hours + 0.5, f"Ελεύθερος Χρόνος: {user_total_free_hours} ώρες", color='r', va='bottom')
+#     # Προσθήκη κειμένου για τον ελεύθερο χρόνο
+#     if len(names) > 0:
+#         plt.text(len(names)-0.5, user_total_free_hours + 0.5, f"Ελεύθερος Χρόνος: {user_total_free_hours} ώρες", color='r', va='bottom')
     
-    # Προσθήκη λεζάντας
-    plt.legend()
+#     # Προσθήκη λεζάντας
+#     plt.legend()
     
-    # Τίτλοι και ετικέτες
-    plt.xlabel("Δραστηριότητες")
-    plt.ylabel("Ώρες")
-    plt.title("Ώρες ανά Δραστηριότητα")
+#     # Τίτλοι και ετικέτες
+#     plt.xlabel("Δραστηριότητες")
+#     plt.ylabel("Ώρες")
+#     plt.title("Ώρες ανά Δραστηριότητα")
     
-    # Περιστροφή ετικετών για καλύτερη αναγνωσιμότητα
-    plt.xticks(rotation=45, ha='right')
+#     # Περιστροφή ετικετών για καλύτερη αναγνωσιμότητα
+#     plt.xticks(rotation=45, ha='right')
     
-    # Προσθήκη grid για καλύτερη οπτικοποίηση
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
+#     # Προσθήκη grid για καλύτερη οπτικοποίηση
+#     plt.grid(axis='y', linestyle='--', alpha=0.7)
     
-    # Αυτόματη προσαρμογή αποστάσεων για βέλτιστη εμφάνιση
-    plt.tight_layout()
+#     # Αυτόματη προσαρμογή αποστάσεων για βέλτιστη εμφάνιση
+#     plt.tight_layout()
     
-    # Εμφάνιση του γραφήματος
-    plt.show()
+#     # Εμφάνιση του γραφήματος
+#     plt.show()
 #-------------------------------------------------------------------------------------------------------------------------------------------------

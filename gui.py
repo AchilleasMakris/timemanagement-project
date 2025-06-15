@@ -324,7 +324,7 @@ def show_all_tasks_frame():
 
 def show_edit_task_frame():
     clear_window()
-    title_label = ctk.CTkLabel(root, text="Επεξεργασία Δραστηριότηας", font=("Arial", 20))
+    title_label = ctk.CTkLabel(root, text="Επεξεργασία Δραστηριότητας", font=("Arial", 20))
     title_label.pack(pady=20)
 
     # Φιλτράρισμα δραστηριοτήτων μόνο του τρέχοντος χρήστη
@@ -375,7 +375,7 @@ def show_edit_task_frame():
     name_entry.pack()
     ctk.CTkLabel(root, text="Διάρκεια (Ώρες):").pack(pady=5)
     duration_entry.pack()
-    ctk.CTkLabel(root, text="Συμαντικότητα (1-10):").pack(pady=5)
+    ctk.CTkLabel(root, text="Σημαντικότητα (1-10):").pack(pady=5)
     importance_entry.pack()
     ctk.CTkLabel(root, text="Τύπος:").pack(pady=5)
 
