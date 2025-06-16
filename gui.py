@@ -48,12 +48,12 @@ def show_login_fields():
 
     username_label = ctk.CTkLabel(root, text="Όνομα χρήστη:")
     username_label.pack(pady=5)
-    username_entry = ctk.CTkEntry(root, width=200)  # Πεδίο εισαγωγής ονόματος χρήστη
+    username_entry = ctk.CTkEntry(root, width=200, placeholder_text="Όνομα χρήστη")
     username_entry.pack()
 
     password_label = ctk.CTkLabel(root, text="Κωδικός χρήστη:")
     password_label.pack(pady=5)
-    password_entry = ctk.CTkEntry(root, width=200, show="*")  # Απόκρυψη κωδικού με αστερίσκους
+    password_entry = ctk.CTkEntry(root, width=200, show="*", placeholder_text="Τουλάχιστον 6 χαρακτήρες")  # Απόκρυψη κωδικού με αστερίσκους
     password_entry.pack()
 
     def login():
@@ -81,12 +81,12 @@ def show_register_fields():
 
     username_label = ctk.CTkLabel(root, text="Όνομα χρήστη:")
     username_label.pack(pady=5)
-    username_entry = ctk.CTkEntry(root, width=200)
+    username_entry = ctk.CTkEntry(root, width=200, placeholder_text="Όνομα χρήστη")
     username_entry.pack()
 
     password_label = ctk.CTkLabel(root, text="Κωδικός χρήστη:")
     password_label.pack(pady=5)
-    password_entry = ctk.CTkEntry(root, width=200, show="*")  # Απόκρυψη κωδικού για ασφάλεια
+    password_entry = ctk.CTkEntry(root, width=200, show="*", placeholder_text="Τουλάχιστον 6 χαρακτήρες")  # Απόκρυψη κωδικού για ασφάλεια
     password_entry.pack()
 
     def register():
@@ -147,7 +147,7 @@ def show_manage_free_time_frame():
 
     user_total_free_hours_label = ctk.CTkLabel(root, text="Δώσε τον ελεύθερο χρόνο που έχεις για αυτή την εβδομάδα σε ώρες:")
     user_total_free_hours_label.pack(pady=5)
-    user_total_free_hours_entry = ctk.CTkEntry(root, width=200)
+    user_total_free_hours_entry = ctk.CTkEntry(root, width=200, placeholder_text="π.χ. 10.5")
     user_total_free_hours_entry.pack()
 
     def update_free_time():
@@ -188,17 +188,17 @@ def show_add_task_frame():
 
     name_label = ctk.CTkLabel(root, text="Όνομα Δραστηριότητας:")
     name_label.pack(pady=5)
-    name_entry = ctk.CTkEntry(root, width=200)
+    name_entry = ctk.CTkEntry(root, width=200, placeholder_text="Όνομα δραστηριότητας")
     name_entry.pack()
 
     duration_label = ctk.CTkLabel(root, text="Διάρκεια (Ώρες):")
     duration_label.pack(pady=5)
-    duration_entry = ctk.CTkEntry(root, width=200)
+    duration_entry = ctk.CTkEntry(root, width=200, placeholder_text="Διάρκεια σε ώρες")
     duration_entry.pack()
 
     importance_label = ctk.CTkLabel(root, text="Σημαντικότητα (1-10):")
     importance_label.pack(pady=5)
-    importance_entry = ctk.CTkEntry(root, width=200)
+    importance_entry = ctk.CTkEntry(root, width=200, placeholder_text="Ακέραιος 1-10")
     importance_entry.pack()
 
     # Type Toggle
@@ -340,9 +340,9 @@ def show_edit_task_frame():
     task_combobox.pack(pady=10)
 
     # Πεδία εισαγωγής για την επεξεργασία
-    name_entry = ctk.CTkEntry(root, width=200)
-    duration_entry = ctk.CTkEntry(root, width=200)
-    importance_entry = ctk.CTkEntry(root, width=200)
+    name_entry = ctk.CTkEntry(root, width=200, placeholder_text="Νέο όνομα δραστηριότητας")
+    duration_entry = ctk.CTkEntry(root, width=200, placeholder_text="Νέα διάρκεια σε ώρες")
+    importance_entry = ctk.CTkEntry(root, width=200, placeholder_text="Νέα σημαντικότητα (1-10)")
 
     selected_type = ctk.StringVar(value="")  # Χρήση StringVar για την αποθήκευση του επιλεγμένου τύπου
 
